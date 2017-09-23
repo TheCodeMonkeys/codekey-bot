@@ -19,13 +19,15 @@ public class CSVParser {
         BufferedReader reader = new BufferedReader(new FileReader(fileLocation));
         String line;
 
-        while ((line = reader.readLine()).equals("")) {
+        while ((line = reader.readLine()) != null) {
             // Adds the user's id and exp from CSV to the universal player list located under Main.java
             String id = line.split(",")[0];
-            int exp = Integer.parseInt(line.split(",")[1]);
+            double exp = Double.parseDouble(line.split(",")[1]);
 
             Main.players.add(new Player(id, exp));
         }
+
+
     }
 
 }

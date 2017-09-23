@@ -1,3 +1,5 @@
 token.txt
 *.iml
 .idea
+data.csv
+data_backup.csv

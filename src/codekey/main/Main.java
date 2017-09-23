@@ -1,5 +1,6 @@
 package codekey.main;
 
+import codekey.level.CSVParser;
 import codekey.level.Player;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -17,10 +18,13 @@ public class Main {
 
     public static String token;
     public static final String DATABASE = "data.csv";
+    public static final String DATABASE_BACKUP = "data_backup.csv";
     // To avoid uploading my token to github, I am going to read it from a file.
     private static final String TOKEN_FILE = "token.txt";
     // data.csv contains the database.
     public static ArrayList<Player> players;
+
+    public static final String PREFIX = "~";
 
     public static void main(String[] args) throws Exception {
         try {
@@ -29,10 +33,9 @@ public class Main {
             e.printStackTrace();
             System.out.println("Failed to load the token.");
         }
-
+        new CSVParser(DATABASE);
         JDA jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListener(new Listener()).buildBlocking();
-        System.out.println(jda.getGuildById("201544496654057472").getMemberById("201723870863032321").getRoles());
-
+        new CSVThread().start();
     }
 
 
@@ -60,7 +63,7 @@ public class Main {
 Score will only count if the last message is by other memeber. should the same memeber send a message twice, it wont count.
 #thank command --- #thank @user reason once/day
 
-score = Message Length/
+score = Message Length/wordsCharacters
 
 S.MOD=309767924921532426
 STAFF=219266745729286145
