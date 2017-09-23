@@ -39,24 +39,24 @@ public class PlayerUtils {
     public static double getEXPFromMessage(String message) {
         int chars = message.split(" ").length;
         int length = message.length();
-
         if (length <= chars) length = chars * 100;
-
-        return chars / length;
+        return (double) chars / length;
     }
 
     public static Rank getRankFromExp(double exp) {
-        if (exp <= 76) return Rank.NO_RANK;
-        if (exp > 76 && exp <= 464) return Rank.KILOBYTE;
-        if (exp > 464 && exp <= 949) return Rank.MEGABYTE;
-        if (exp > 949 && exp <= 1758) return Rank.TERABYTE;
-        if (exp > 1758 && exp <= 2676) return Rank.PETABYTE;
-        if (exp > 2676 && exp < 20000) return Rank.EXABYTE;
+        if (exp < 76) return Rank.NO_RANK;
+        if (exp >= 76 && exp < 464) return Rank.KILOBYTE;
+        if (exp >= 464 && exp < 949) return Rank.MEGABYTE;
+        if (exp >= 949 && exp < 1758) return Rank.GIGABYTE;
+        if (exp >= 1758 && exp < 2676) return Rank.TERABYTE;
+        if (exp >= 2676 && exp < 5187) return Rank.PETABYTE;
+        if (exp >= 5187 && exp < 20000) return Rank.EXABYTE;
         else return Rank.UNKNOWN;
     }
 
     public static Rank getNextRank(Rank rank) {
-        if (rank == Rank.NO_RANK) return Rank.MEGABYTE;
+        if (rank == Rank.NO_RANK) return Rank.KILOBYTE;
+        if (rank == Rank.KILOBYTE) return Rank.MEGABYTE;
         if (rank == Rank.MEGABYTE) return Rank.GIGABYTE;
         if (rank == Rank.GIGABYTE) return Rank.TERABYTE;
         if (rank == Rank.TERABYTE) return Rank.PETABYTE;
@@ -65,17 +65,19 @@ public class PlayerUtils {
     }
 
     public static double expNeededForNextRank(double exp) {
-        return (getExpFromRank(getNextRank(getRankFromExp(exp))) - exp);
+        if (getRankFromExp(exp) == Rank.UNKNOWN) return 0;
+        return Math.abs(getExpFromRank(getNextRank(getRankFromExp(exp))) - exp);
     }
 
     public static int getExpFromRank(Rank rank) {
         if (rank == Rank.NO_RANK) return 0;
-        if (rank == Rank.MEGABYTE) return 76;
-        if (rank == Rank.GIGABYTE) return 464;
-        if (rank == Rank.TERABYTE) return 949;
-        if (rank == Rank.PETABYTE) return 1758;
+        if (rank == Rank.KILOBYTE) return 76;
+        if (rank == Rank.MEGABYTE) return 464;
+        if (rank == Rank.GIGABYTE) return 949;
+        if (rank == Rank.TERABYTE) return 1758;
+        if (rank == Rank.PETABYTE) return 2676;
         if (rank == Rank.UNKNOWN) return 20000;
-        else return 2676;
+        else return 5187;
     }
 
     public static Rank getRankFromRole(String roleID) {

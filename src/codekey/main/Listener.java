@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by thvardhan from codemonkeys discord server https://discord.gg/PAH8y8W on 9/22/17.
@@ -16,7 +17,7 @@ import java.io.IOException;
 public class Listener extends ListenerAdapter {
 
 
-    private static User lastMessage;
+    public static ArrayList<User> lastMessage = new ArrayList<>();
 
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
@@ -32,10 +33,10 @@ public class Listener extends ListenerAdapter {
         if (event.getMessage().getContent().startsWith(Main.PREFIX))
             handleCommand(event.getMessage().getContent(), event);
 
-        if (event.getAuthor().isBot() || lastMessageBySamePerson(event.getAuthor()))
+        if (event.getAuthor().isBot() || lastMessage.contains(event.getAuthor()))
             return;
 
-        lastMessage = event.getAuthor();
+        lastMessage.add(event.getAuthor());
 
 
         // Adds exp to respective player with the formula EXP=WORDS/TOTAL_LENGTH with some adjustments
@@ -79,8 +80,9 @@ public class Listener extends ListenerAdapter {
                             "Present EXP : " + p.getExp() + "\n" +
                             "Next Rank : " + PlayerUtils.getNextRank(PlayerUtils.getRankFromExp(p.getExp())) + "\n" +
                             "EXP Needed : " + PlayerUtils.expNeededForNextRank(p.getExp())).queue();
+                    break;
                 }
-                break;
+
             }
 
 

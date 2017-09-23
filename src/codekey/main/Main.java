@@ -2,6 +2,7 @@ package codekey.main;
 
 import codekey.level.CSVParser;
 import codekey.level.Player;
+import codekey.level.SpamThread;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -36,6 +37,7 @@ public class Main {
         new CSVParser(DATABASE);
         JDA jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListener(new Listener()).buildBlocking();
         new CSVThread().start();
+        new SpamThread().start();
     }
 
 

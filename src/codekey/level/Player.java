@@ -30,12 +30,16 @@ public class Player {
     public void addExp(double exp, GuildMessageReceivedEvent event) {
         this.exp += exp;
         checkForNewRank(event);
+        System.out.println(this.exp);
     }
 
     private void checkForNewRank(GuildMessageReceivedEvent event) {
         if (rank != PlayerUtils.getRankFromExp(exp)) {
             event.getGuild().getController().addSingleRoleToMember(event.getMember(),
                     event.getGuild().getRoleById(PlayerUtils.getRoleFromRank(PlayerUtils.getNextRank(rank)))).queue();
+            event.getGuild().getController().removeSingleRoleFromMember(event.getMember(),
+                    event.getGuild().getRoleById(PlayerUtils.getRoleFromRank(rank))).queue();
+            rank = PlayerUtils.getNextRank(rank);
         }
     }
 
