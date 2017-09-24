@@ -71,7 +71,22 @@ public class Listener extends ListenerAdapter {
 
 
     private void handleCommand(String msg, GuildMessageReceivedEvent event) {
-        if (msg.contains("status")) {
+
+        if (event.getMessage().getMentionedUsers().size() > 0 && msg.contains("status")) {
+            String id = event.getMessage().getMentionedUsers().get(0).getId();
+
+            for (Player p : Main.players) {
+                if (p.getId().equals(id)) {
+                    event.getChannel().sendMessage("Present Rank : " + PlayerUtils.getRankFromExp(p.getExp()) + "\n" +
+                            "Present EXP : " + p.getExp() + "\n" +
+                            "Next Rank : " + PlayerUtils.getNextRank(PlayerUtils.getRankFromExp(p.getExp())) + "\n" +
+                            "EXP Needed : " + PlayerUtils.expNeededForNextRank(p.getExp())).queue();
+                    break;
+                }
+
+            }
+
+        } else if (msg.contains("status")) {
             String id = event.getAuthor().getId();
 
             for (Player p : Main.players) {
