@@ -40,7 +40,7 @@ public class PlayerUtils {
         int chars = message.split(" ").length;
         int length = message.length();
         if (length <= chars) length = chars * 100;
-        return (double) chars / length;
+        return ((double) chars / length) * 10;
     }
 
     public static Rank getRankFromExp(double exp) {

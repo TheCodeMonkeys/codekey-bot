@@ -30,12 +30,18 @@ public class Listener extends ListenerAdapter {
         }
 
 
+        // If the message starts with PREFIX (~) then it will be further checked for word 'status'
         if (event.getMessage().getContent().startsWith(Main.PREFIX))
             handleCommand(event.getMessage().getContent(), event);
 
-        if (event.getAuthor().isBot() || lastMessage.contains(event.getAuthor()))
+        // If the user is a bot OR they are in spam timer OR its the spam channel then ignore the message
+        if (event.getAuthor().isBot() || lastMessage.contains(event.getAuthor()) ||
+                event.getChannel() == event.getGuild().getTextChannelById("208003522157871124"))
             return;
 
+        // If code reaches here then it means that the user is eligible to get points.
+        // but before they get their sweet EXP code adds them to a spam counter so they wont
+        // get any more EXP for the next 5 mins or so based on the time given in SpamThread.java
         lastMessage.add(event.getAuthor());
 
 
@@ -45,6 +51,7 @@ public class Listener extends ListenerAdapter {
         }
 
         try {
+            //Once player gets the new score, update the database file.
             writeToCSV();
         } catch (Exception e) {
             System.out.println("Unable to write file... Dming the creator");
@@ -71,7 +78,22 @@ public class Listener extends ListenerAdapter {
 
 
     private void handleCommand(String msg, GuildMessageReceivedEvent event) {
-        if (msg.contains("status")) {
+
+        if (event.getMessage().getMentionedUsers().size() > 0 && msg.contains("status")) {
+            String id = event.getMessage().getMentionedUsers().get(0).getId();
+
+            for (Player p : Main.players) {
+                if (p.getId().equals(id)) {
+                    event.getChannel().sendMessage("Present Rank : " + PlayerUtils.getRankFromExp(p.getExp()) + "\n" +
+                            "Present EXP : " + p.getExp() + "\n" +
+                            "Next Rank : " + PlayerUtils.getNextRank(PlayerUtils.getRankFromExp(p.getExp())) + "\n" +
+                            "EXP Needed : " + PlayerUtils.expNeededForNextRank(p.getExp())).queue();
+                    break;
+                }
+
+            }
+
+        } else if (msg.contains("status")) {
             String id = event.getAuthor().getId();
 
             for (Player p : Main.players) {
