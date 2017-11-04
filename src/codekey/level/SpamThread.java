@@ -13,7 +13,7 @@ public class SpamThread extends Thread {
 
         while (true) {
             try {
-                Thread.sleep(60000);
+                Thread.sleep(300000);//5 mins
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 break;
