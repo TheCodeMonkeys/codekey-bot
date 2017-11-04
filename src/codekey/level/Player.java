@@ -30,7 +30,6 @@ public class Player {
     public void addExp(double exp, GuildMessageReceivedEvent event) {
         this.exp += exp;
         checkForNewRank(event);
-        System.out.println(this.exp);
     }
 
     private void checkForNewRank(GuildMessageReceivedEvent event) {
