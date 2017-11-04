@@ -99,9 +99,9 @@ public class Listener extends ListenerAdapter {
             for (Player p : Main.players) {
                 if (p.getId().equals(id)) {
                     event.getChannel().sendMessage("Present Rank : " + PlayerUtils.getRankFromExp(p.getExp()) + "\n" +
-                            "Present EXP : " + p.getExp() + "\n" +
+                            "Present EXP : " + (int) p.getExp() + "\n" +
                             "Next Rank : " + PlayerUtils.getNextRank(PlayerUtils.getRankFromExp(p.getExp())) + "\n" +
-                            "EXP Needed : " + PlayerUtils.expNeededForNextRank(p.getExp())).queue();
+                            "EXP Needed : " + (int) PlayerUtils.expNeededForNextRank(p.getExp())).queue();
                     break;
                 }
 
