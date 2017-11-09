@@ -1,6 +1,9 @@
 token.txt
 *.iml
 .idea
+.settings/*
+.classpath
+.project
 data.csv
 data_backup.csv
 /target/
