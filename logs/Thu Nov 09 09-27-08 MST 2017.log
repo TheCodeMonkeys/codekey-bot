@@ -1,0 +1,9 @@
+[09:27:09] [DiscLoader/INFO]: Attempting to login
+[09:27:10] [Gateway/INFO]: Connecting to Gateway with Endpoint: wss://gateway.discord.gg?v=7&encoding=json
+[09:27:11] [Gateway Listener/INFO]: Connected to the gateway
+[09:27:52] [Gateway/INFO]: Attempting to Heartbeat
+[09:27:53] [Gateway Listener/INFO]: Heartbeat Acknowledged
+[09:28:34] [Gateway/INFO]: Attempting to Heartbeat
+[09:28:34] [Gateway Listener/INFO]: Heartbeat Acknowledged
+[09:29:15] [Gateway/INFO]: Attempting to Heartbeat
+[09:29:15] [Gateway Listener/INFO]: Heartbeat Acknowledged

@@ -1,0 +1,3 @@
+[09:25:15] [DiscLoader/INFO]: Attempting to login
+[09:25:17] [Gateway/INFO]: Connecting to Gateway with Endpoint: wss://gateway.discord.gg?v=7&encoding=json
+[09:25:18] [Gateway Listener/INFO]: Connected to the gateway
