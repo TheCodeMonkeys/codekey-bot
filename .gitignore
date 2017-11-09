@@ -4,3 +4,5 @@ token.txt
 data.csv
 data_backup.csv
 /target/
+logs/Thu Nov 09 09-27-08 MST 2017.log
+*.log

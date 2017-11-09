@@ -7,3 +7,15 @@
 [09:28:34] [Gateway Listener/INFO]: Heartbeat Acknowledged
 [09:29:15] [Gateway/INFO]: Attempting to Heartbeat
 [09:29:15] [Gateway Listener/INFO]: Heartbeat Acknowledged
+[09:29:56] [Gateway/INFO]: Attempting to Heartbeat
+[09:29:56] [Gateway Listener/INFO]: Heartbeat Acknowledged
+[09:30:37] [Gateway/INFO]: Attempting to Heartbeat
+[09:30:38] [Gateway Listener/INFO]: Heartbeat Acknowledged
+[09:34:37] [Gateway/INFO]: Attempting to Heartbeat
+[09:34:37] [Gateway/SEVERE]: Killing heartbeat
+[09:34:37] [Gateway/WARNING]: The thread: Gateway - Heartbeat, has been interrupted
+[09:34:37] [Gateway/WARNING]: The thread: Gateway - Rate Limiter, has been interrupted
+[09:34:37] [Gateway Listener/SEVERE]: Client was disconnected from the gateway, Code: 1008
+[09:34:37] [Gateway Listener/INFO]: Waiting to reconnect to the gateway
+[09:34:42] [Gateway Listener/INFO]: Attempting to reconnect to the gateway
+[09:34:43] [Gateway Listener/INFO]: Connected to the gateway
