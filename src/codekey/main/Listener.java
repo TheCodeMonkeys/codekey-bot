@@ -44,6 +44,8 @@ public class Listener extends EventListenerAdapter {
 		// ignore the message
 		if (e.getMessage().getAuthor().isBot() || lastMessage.contains(e.getMessage().getAuthor()) || e.getChannel().getID() == 208003522157871124l)
 			return;
+		if (e.getMessage().getContent().equalsIgnoreCase("~status"))
+			return;
 
 		// If code reaches here then it means that the user is eligible to get points.
 		// but before they get their sweet EXP code adds them to a spam counter so they
