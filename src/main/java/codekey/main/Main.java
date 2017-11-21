@@ -7,7 +7,6 @@ import java.util.Map;
 
 import codekey.level.CSVParser;
 import codekey.level.Player;
-import codekey.level.SpamThread;
 import codekey.main.commands.CommandStatus;
 import io.discloader.discloader.common.DLOptions;
 import io.discloader.discloader.common.DiscLoader;
@@ -28,7 +27,7 @@ public class Main {
 	public static Map<Long, Player> players;
 	public static DiscLoader loader;
 
-	public static final String PREFIX = "~";
+	public static final String PREFIX = "c!";
 
 	public static void main(String[] args) throws Exception {
 		try {
@@ -39,13 +38,13 @@ public class Main {
 		}
 		new CSVParser(DATABASE);
 		// DLOptions options = new DLOptions(token);
-		loader = new DiscLoader(new DLOptions(token, PREFIX)).addEventHandler(new Listener()).login().get();
+		loader = new DiscLoader(new DLOptions(token, PREFIX)).addEventListener(new Listener()).login().get();
 		CommandRegistry.registerCommand(new CommandStatus(), "status");
 		// JDA jda = new
 		// JDABuilder(AccountType.BOT).setToken(token).addEventListener(new
 		// Listener()).buildBlocking();
 		new CSVThread().start();
-		new SpamThread().start();
+		// new SpamThread().start();
 	}
 
 	// This is probably the best way...
