@@ -45,18 +45,20 @@ public class PlayerUtils {
 	public static Rank getRankFromExp(double exp) {
 		if (exp < 30)
 			return Rank.NO_RANK;
-		if (exp >= 30 && exp < 464)
+		else if (exp >= 30 && exp < 464)
 			return Rank.KILOBYTE;
-		if (exp >= 464 && exp < 949)
+		else if (exp >= 464 && exp < 949)
 			return Rank.MEGABYTE;
-		if (exp >= 949 && exp < 1758)
+		else if (exp >= 949 && exp < 1758)
 			return Rank.GIGABYTE;
-		if (exp >= 1758 && exp < 2676)
+		else if (exp >= 1758 && exp < 2676)
 			return Rank.TERABYTE;
-		if (exp >= 2676 && exp < 5187)
+		else if (exp >= 2676 && exp < 5187)
 			return Rank.PETABYTE;
-		if (exp >= 5187 && exp < 20000)
+		else if (exp >= 5187 && exp < 20000)
 			return Rank.EXABYTE;
+		else if (exp >= 20000)
+			return Rank.STAFF;
 		else
 			return Rank.UNKNOWN;
 	}
@@ -74,12 +76,14 @@ public class PlayerUtils {
 			return Rank.PETABYTE;
 		if (rank == Rank.PETABYTE)
 			return Rank.EXABYTE;
+		if (rank == Rank.STAFF)
+			return Rank.STAFF;
 		else
 			return Rank.UNKNOWN;
 	}
 
 	public static double expNeededForNextRank(double exp) {
-		if (getRankFromExp(exp) == Rank.UNKNOWN)
+		if (getRankFromExp(exp) == Rank.UNKNOWN || getRankFromExp(exp) == Rank.STAFF)
 			return 0;
 		return Math.abs(getExpFromRank(getNextRank(getRankFromExp(exp))) - exp);
 	}
@@ -116,6 +120,8 @@ public class PlayerUtils {
 			return Rank.PETABYTE;
 		else if (roleID == 241334568039219200l)
 			return Rank.EXABYTE;
+		else if (roleID == 219266745729286145l)
+			return Rank.STAFF;
 		else
 			return Rank.UNKNOWN;
 	}
@@ -133,6 +139,8 @@ public class PlayerUtils {
 			return "219278875203600384";
 		else if (rank == Rank.EXABYTE)
 			return "241334568039219200";
+		else if (rank == Rank.STAFF)
+			return "219266745729286145";
 		else
 			return "-1";
 	}

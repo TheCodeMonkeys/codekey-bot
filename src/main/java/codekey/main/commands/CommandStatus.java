@@ -31,10 +31,10 @@ public class CommandStatus extends Command {
 		if (player == null)
 			return;
 		Rank current = PlayerUtils.getRankFromExp(player.getExp());
-		RichEmbed embed = new RichEmbed("Status").setAuthor(user.getUsername(), "", user.getAvatar().toString());
-		embed.addField("Current Rank", current, true);
-		embed.addField("Present EXP", player.getExp(), true).addField("Next Rank", PlayerUtils.getNextRank(current), true);
-		embed.addField("EXP Needed", PlayerUtils.expNeededForNextRank(player.getExp()), true);
+		RichEmbed embed = new RichEmbed("Status").setAuthor(user.getUsername(), "", user.getAvatar().toString()).setColor(0xff0000);
+		embed.addField("Current Rank", current, true).addField("Present EXP", player.getExp(), true);
+		embed.addField("Next Rank", PlayerUtils.getNextRank(current), true).addField("EXP Needed", PlayerUtils.expNeededForNextRank(player.getExp()), true);
+		embed.setFooter("© Code Monkeys.dll 2017").setTimestamp();
 		e.getChannel().sendEmbed(embed);
 	}
 

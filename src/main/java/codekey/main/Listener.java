@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import codekey.level.Player;
 import codekey.level.PlayerUtils;
@@ -21,6 +23,7 @@ import io.discloader.discloader.entity.user.IUser;
 public class Listener extends EventListenerAdapter {
 
 	public static ArrayList<IUser> lastMessage = new ArrayList<>();
+	public static Map<Long, Long> lastEXP = new HashMap<>();
 
 	@Override
 	public void GuildMessageCreate(GuildMessageCreateEvent e) {
@@ -42,17 +45,27 @@ public class Listener extends EventListenerAdapter {
 
 		// If the user is a bot OR they are in spam timer OR its the spam channel then
 		// ignore the message
-		if (e.getMessage().getAuthor().isBot() || lastMessage.contains(e.getMessage().getAuthor()) || e.getChannel().getID() == 208003522157871124l)
+		if (e.getMessage().getAuthor().isBot() || e.getChannel().getID() == 208003522157871124l)
 			return;
-		if (e.getMessage().getContent().equalsIgnoreCase("~status"))
+		if (e.getMessage().getContent().toLowerCase().startsWith(Main.PREFIX + "status")) // don't give exp if the user is checking someones status
 			return;
+		long currentTime = System.currentTimeMillis();
+		if (lastEXP.containsKey(id) && lastEXP.get(id) - currentTime < 300000) // if it's been less than 5 minutes since the user received EXP return.
+			return;
+
+		/*
+		 * If the program gets here, either the user's cooldown is over or, they haven't
+		 * sent a message . So we should set the value at user.id in the lastEXP map to
+		 * currentTime
+		 */
+		lastEXP.put(id, currentTime); // id is the user's ID, and currentTime is the current time in milliseconds.
 
 		// If code reaches here then it means that the user is eligible to get points.
 		// but before they get their sweet EXP code adds them to a spam counter so they
 		// wont
 		// get any more EXP for the next 5 mins or so based on the time given in
 		// SpamThread.java
-		lastMessage.add(author);
+		// lastMessage.add(author);
 
 		// Adds exp to respective player with the formula EXP=WORDS/TOTAL_LENGTH with
 		// some adjustments
