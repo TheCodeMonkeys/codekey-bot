@@ -4,10 +4,12 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import codekey.level.CSVParser;
 import codekey.level.Player;
 import codekey.main.commands.CommandStatus;
+import io.discloader.discloader.client.logger.DLLogger;
 import io.discloader.discloader.common.DLOptions;
 import io.discloader.discloader.common.DiscLoader;
 import io.discloader.discloader.common.registry.CommandRegistry;
@@ -29,12 +31,14 @@ public class Main {
 
 	public static final String PREFIX = "c!";
 
+	public static final Logger logger = new DLLogger("Codekey").getLogger();
+
 	public static void main(String[] args) throws Exception {
 		try {
 			readToken();
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("Failed to load the token.");
+			logger.severe("Failed to load the token.");
 		}
 		new CSVParser(DATABASE);
 		// DLOptions options = new DLOptions(token);

@@ -33,9 +33,9 @@ public class Listener extends EventListenerAdapter {
 
 		if (!PlayerUtils.listContainsId(id) && !author.isBot()) {
 			// Fired if a person's ID doesn't already exist in my list. if so, then make a
-			// new entry and
-			// Add points to that person according to their role.
+			// new entry and Add points to that person according to their role.
 			PlayerUtils.addNewPlayerEntryWithRank(id, e.getMessage().getMember().getRoles());
+			Main.logger.info("Registering new user (" + author.toString() + ") into the database");
 		}
 
 		// If the message starts with PREFIX (~) then it will be further checked for
@@ -50,7 +50,7 @@ public class Listener extends EventListenerAdapter {
 		if (e.getMessage().getContent().toLowerCase().startsWith(Main.PREFIX + "status")) // don't give exp if the user is checking someones status
 			return;
 		long currentTime = System.currentTimeMillis();
-		if (lastEXP.containsKey(id) && lastEXP.get(id) - currentTime < 300000) // if it's been less than 5 minutes since the user received EXP return.
+		if (lastEXP.containsKey(id) && currentTime - lastEXP.get(id) < 60000) // if it's been less than a minute since the user received EXP return.
 			return;
 
 		/*
@@ -70,9 +70,11 @@ public class Listener extends EventListenerAdapter {
 		// Adds exp to respective player with the formula EXP=WORDS/TOTAL_LENGTH with
 		// some adjustments
 		Player p = Main.players.get(id);
-		if (p != null)
-			p.addExp(PlayerUtils.getEXPFromMessage(message.getContent()), e);
-
+		if (p != null) {
+			double exp = PlayerUtils.getEXPFromMessage(message.getContent());
+			p.addExp(exp, e);
+			Main.logger.info("Gave " + author + " " + exp + "EXP");
+		}
 		try {
 			// Once player gets the new score, update the database file.
 			writeToCSV();

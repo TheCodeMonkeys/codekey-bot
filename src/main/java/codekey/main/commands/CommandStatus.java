@@ -35,7 +35,7 @@ public class CommandStatus extends Command {
 		embed.setDescription("Displaying User Status");
 		embed.addField("Current Rank", current, true).addField("Present EXP", (int) player.getExp(), true);
 		embed.addField("Next Rank", PlayerUtils.getNextRank(current), true).addField("EXP Needed", (int) PlayerUtils.expNeededForNextRank(player.getExp()), true);
-		embed.setFooter("© Code Monkeys.jar 2017").setTimestamp();
+		embed.setFooter("© Code Monkeys.cpp 2017").setTimestamp();
 		e.getChannel().sendEmbed(embed);
 	}
 

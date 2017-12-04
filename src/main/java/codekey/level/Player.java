@@ -2,6 +2,7 @@ package codekey.level;
 
 import java.util.concurrent.CompletableFuture;
 
+import codekey.main.Main;
 import io.discloader.discloader.common.event.message.GuildMessageCreateEvent;
 import io.discloader.discloader.entity.guild.IGuild;
 import io.discloader.discloader.entity.guild.IGuildMember;
@@ -37,6 +38,7 @@ public class Player {
 
 	private void checkForNewRank(GuildMessageCreateEvent event) {
 		if (rank != PlayerUtils.getRankFromExp(exp)) {
+			Main.logger.info("Player with id: " + id + " has ranked up to: " + PlayerUtils.getRoleFromRank(PlayerUtils.getNextRank(rank)));
 			IGuild guild = event.getGuild();
 			IGuildMember member = event.getMessage().getMember();
 			CompletableFuture<IGuildMember> gcf = member.giveRole(guild.getRoleByID(PlayerUtils.getRoleFromRank(PlayerUtils.getNextRank(rank))));
