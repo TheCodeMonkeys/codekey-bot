@@ -11,6 +11,7 @@ import java.util.Map;
 import codekey.level.Player;
 import codekey.level.PlayerUtils;
 import io.discloader.discloader.common.event.EventListenerAdapter;
+import io.discloader.discloader.common.event.ReadyEvent;
 import io.discloader.discloader.common.event.message.GuildMessageCreateEvent;
 import io.discloader.discloader.common.registry.EntityRegistry;
 import io.discloader.discloader.entity.message.IMessage;
@@ -23,6 +24,10 @@ import io.discloader.discloader.entity.user.IUser;
 public class Listener extends EventListenerAdapter {
 
 	public static ArrayList<IUser> lastMessage = new ArrayList<>();
+	/**
+	 * Map of the last time a user was given EXP indexed by the user's
+	 * {@link IUser#getID() id}
+	 */
 	public static Map<Long, Long> lastEXP = new HashMap<>();
 
 	@Override
@@ -38,13 +43,16 @@ public class Listener extends EventListenerAdapter {
 			Main.logger.info("Registering new user (" + author.toString() + ") into the database");
 		}
 
-		// If the message starts with PREFIX (~) then it will be further checked for
-		// word 'status'
-		// if (event.getMessage().getContent().startsWith(Main.PREFIX))
-		// handleCommand(event.getMessage().getContent(), event);
-
-		// If the user is a bot OR they are in spam timer OR its the spam channel then
-		// ignore the message
+		/*
+		 * If the message starts with PREFIX (~) then it will be further checked for
+		 * word 'status'
+		 * 
+		 * if (event.getMessage().getContent().startsWith(Main.PREFIX))
+		 * handleCommand(event.getMessage().getContent(), event);
+		 * 
+		 * If the user is a bot OR they are in spam timer OR its the spam channel then
+		 * ignore the message
+		 */
 		if (e.getMessage().getAuthor().isBot() || e.getChannel().getID() == 208003522157871124l)
 			return;
 		if (e.getMessage().getContent().toLowerCase().startsWith(Main.PREFIX + "status")) // don't give exp if the user is checking someones status
@@ -105,40 +113,8 @@ public class Listener extends EventListenerAdapter {
 		writer.close();
 	}
 
-	// private void handleCommand(String msg, GuildMessageReceivedEvent event) {
-	//
-	// if (event.getMessage().getMentionedUsers().size() > 0 &&
-	// msg.contains("status")) {
-	// String id = event.getMessage().getMentionedUsers().get(0).getId();
-	//
-	// for (Player p : Main.players) {
-	// if (p.getId().equals(id)) {
-	// event.getChannel().sendMessage("Present Rank : " +
-	// PlayerUtils.getRankFromExp(p.getExp()) + "\n" + "Present EXP : " + p.getExp()
-	// + "\n" + "Next Rank : " +
-	// PlayerUtils.getNextRank(PlayerUtils.getRankFromExp(p.getExp())) + "\n" + "EXP
-	// Needed : " + PlayerUtils.expNeededForNextRank(p.getExp())).queue();
-	// break;
-	// }
-	//
-	// }
-	//
-	// } else if (msg.contains("status")) {
-	// String id = event.getAuthor().getId();
-	//
-	// for (Player p : Main.players) {
-	// if (p.getId().equals(id)) {
-	// event.getChannel().sendMessage("Present Rank : " +
-	// PlayerUtils.getRankFromExp(p.getExp()) + "\n" + "Present EXP : " +
-	// (Math.floor(p.getExp())) + "\n" + "Next Rank : " +
-	// PlayerUtils.getNextRank(PlayerUtils.getRankFromExp(p.getExp())) + "\n" + "EXP
-	// Needed : " +
-	// Math.floor(PlayerUtils.expNeededForNextRank(p.getExp()))).queue();
-	// break;
-	// }
-	//
-	// }
-	// }
-	// }
+	public void Ready(ReadyEvent e) {
+		Main.logger.info("Codekey is now ready to communicate with Discord");
+	}
 
 }
