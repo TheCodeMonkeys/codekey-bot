@@ -50,7 +50,7 @@ public class Player {
 		} else if (!event.getMessage().getMember().hasRole(event.getGuild().getRoleByID(rank.getID()))) {
 			CompletableFuture<IGuildMember> gcf = event.getMessage().getMember().giveRole(event.getGuild().getRoleByID(rank.getID()));
 			gcf.thenAcceptAsync((nm) -> {
-				Main.logger.info("Fixed Player Rank Desync");
+				Main.logger.info("Fixed Player Rank Desync for " + event.getMessage().getMember());
 			});
 		}
 	}

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import codekey.level.Player;
 import codekey.level.PlayerUtils;
+import io.discloader.discloader.common.event.DisconnectEvent;
 import io.discloader.discloader.common.event.EventListenerAdapter;
 import io.discloader.discloader.common.event.ReadyEvent;
 import io.discloader.discloader.common.event.message.GuildMessageCreateEvent;
@@ -115,6 +116,13 @@ public class Listener extends EventListenerAdapter {
 
 	public void Ready(ReadyEvent e) {
 		Main.logger.info("Codekey is now ready to communicate with Discord");
+	}
+
+	@Override
+	public void Disconnected(DisconnectEvent e) {
+		if (e.getClientFrame().getCloseCode() == 1007 || e.getServerFrame().getCloseCode() == 1007) {
+			System.exit(1);
+		}
 	}
 
 }
