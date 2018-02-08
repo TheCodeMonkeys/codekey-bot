@@ -33,16 +33,11 @@ public class Listener extends EventListenerAdapter {
 
 	@Override
 	public void GuildMessageCreate(GuildMessageCreateEvent e) {
+		if (e.getGuild().getID() != 201544496654057472l)
+			return;
 		IMessage message = e.getMessage();
 		IUser author = message.getAuthor();
 		long id = author.getID();
-
-		if (!PlayerUtils.listContainsId(id) && !author.isBot()) {
-			// Fired if a person's ID doesn't already exist in my list. if so, then make a
-			// new entry and Add points to that person according to their role.
-			PlayerUtils.addNewPlayerEntryWithRank(id, e.getMessage().getMember().getRoles());
-			Main.logger.info("Registering new user (" + author.toString() + ") into the database");
-		}
 
 		/*
 		 * If the message starts with PREFIX (~) then it will be further checked for
@@ -69,21 +64,19 @@ public class Listener extends EventListenerAdapter {
 		 */
 		lastEXP.put(id, currentTime); // id is the user's ID, and currentTime is the current time in milliseconds.
 
-		// If code reaches here then it means that the user is eligible to get points.
-		// but before they get their sweet EXP code adds them to a spam counter so they
-		// wont
-		// get any more EXP for the next 5 mins or so based on the time given in
-		// SpamThread.java
-		// lastMessage.add(author);
-
 		// Adds exp to respective player with the formula EXP=WORDS/TOTAL_LENGTH with
 		// some adjustments
 		Player p = Main.players.get(id);
-		if (p != null) {
-			double exp = PlayerUtils.getEXPFromMessage(message.getContent());
-			p.addExp(exp, e);
-			Main.logger.info("Gave " + author + " " + exp + "EXP");
+		// create new a player entry if an entry wasn't found in the players list.
+		if (p == null) {
+			// Fired if a person's ID doesn't already exist in my list. if so, then make a
+			// new entry and Add points to that person according to their role.
+			p = PlayerUtils.addNewPlayerEntryWithRank(id, e.getMessage().getMember().getRoles());
+			Main.logger.info("Registering new user (" + author.toString() + ") into the database");
 		}
+		double exp = PlayerUtils.getEXPFromMessage(message.getContent());
+		p.addExp(exp, e);
+		Main.logger.info("Gave " + author + " " + exp + "EXP");
 		try {
 			// Once player gets the new score, update the database file.
 			writeToCSV();
@@ -92,16 +85,8 @@ public class Listener extends EventListenerAdapter {
 			ex.printStackTrace();
 			EntityRegistry.getUserByID(104063667351322624l).sendMessage("Error: " + ex.getMessage());
 
-			// e.getGuild().getMemberById("201723870863032321").getUser().openPrivateChannel().queue(Channel
-			// -> {
-			// Channel.sendMessage("error in bot " + ex.getMessage()).queue();
-			// });
 		}
 	}
-
-	// private boolean lastMessageBySamePerson(User user) {
-	// return user.equals(lastMessage);
-	// }
 
 	private void writeToCSV() throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(Main.DATABASE));

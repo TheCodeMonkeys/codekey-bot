@@ -9,6 +9,7 @@ import io.discloader.discloader.common.event.message.MessageCreateEvent;
 import io.discloader.discloader.core.entity.RichEmbed;
 import io.discloader.discloader.entity.channel.ChannelTypes;
 import io.discloader.discloader.entity.channel.IGuildTextChannel;
+import io.discloader.discloader.entity.guild.IGuild;
 import io.discloader.discloader.entity.guild.IGuildMember;
 import io.discloader.discloader.entity.message.IMessage;
 import io.discloader.discloader.entity.user.IUser;
@@ -27,9 +28,15 @@ public class CommandStatus extends Command {
 		}
 		IMessage message = e.getMessage();
 		IUser user = message.getMentions().size() > 0 ? message.getMentions().getUsers().get(0) : message.getAuthor();
+
 		Player player = Main.players.get(user.getID());
-		if (player == null)
-			return;
+		// create new a player entry if an entry wasn't found in the players list 
+		if (player == null) {
+			IGuild guild = message.getGuild();
+			if (guild == null || guild.getID() != 201544496654057472l) // if not run in a guild or the guild is not codemonkey's, return.
+				return;
+			player = PlayerUtils.addNewPlayerEntryWithRank(user.getID(), guild.getMember(user.getID()).getRoles()); // create the new entry and set player to the entry
+		}
 		Rank current = PlayerUtils.getRankFromExp(player.getExp());
 		RichEmbed embed = new RichEmbed("Status").setAuthor(user.getUsername(), "", user.getAvatar().toString()).setColor(current.getColor());
 		embed.setDescription("Displaying User Status");

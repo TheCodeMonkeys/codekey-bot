@@ -19,13 +19,16 @@ public class PlayerUtils {
 	 * @param ID
 	 * @param role
 	 */
-	public static void addNewPlayerEntryWithRank(long ID, List<IRole> roles) {
-		if (roles.isEmpty())
-			Main.players.put(ID, new Player(ID, 0));
-		else
-			Main.players.put(ID, new Player(ID, getExpFromRank(getRankFromRole(roles.get(0).getID()))));
+	public static Player addNewPlayerEntryWithRank(long ID, List<IRole> roles) {
+		Player player = new Player(ID, roles.isEmpty() ? 0 : getExpFromRank(getRankFromRole(roles.get(0).getID())));
+		Main.players.put(ID, player);
+		return player;
 	}
-
+//
+//	public static Player getPlayer(long ID) {
+//		return null;
+//	}
+	
 	public static double expNeededForNextRank(double exp) {
 		if (getRankFromExp(exp) == Rank.UNKNOWN || getRankFromExp(exp) == Rank.STAFF)
 			return 0;
@@ -42,6 +45,7 @@ public class PlayerUtils {
 	}
 
 	private static double g(int w, int l) {
+		if (w == 0) return 0;
 		return l / w;
 	}
 

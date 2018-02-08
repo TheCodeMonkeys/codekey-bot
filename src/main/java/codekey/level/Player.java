@@ -38,6 +38,8 @@ public class Player {
 	}
 
 	private void checkForNewRank(GuildMessageCreateEvent event) {
+		// update rank if the player's current rank is different from the rank they
+		// should have based on the amount of Exp they have.
 		if (rank != PlayerUtils.getRankFromExp(exp)) {
 			Main.logger.info("Player with id: " + id + " has ranked up to: " + PlayerUtils.getRoleFromRank(PlayerUtils.getNextRank(rank)));
 			IGuild guild = event.getGuild();
@@ -47,7 +49,10 @@ public class Player {
 				nm.takeRole(guild.getRoleByID(rank.getID()));
 			});
 			rank = PlayerUtils.getNextRank(rank);
-		} else if (!event.getMessage().getMember().hasRole(event.getGuild().getRoleByID(rank.getID()))) {
+		}
+		// force rank sync if the player is missing the role that goes with their rank
+		if ((rank != Rank.NO_RANK && rank != Rank.UNKNOWN) && !event.getMessage().getMember().hasRole(event.getGuild().getRoleByID(rank.getID())) && !event.getMessage().getMember().hasRole(event.getGuild().getRoleByID(Rank.STAFF.getID()))) {
+			Main.logger.info("Attempting to fix Player Rank desync for " + event.getMessage().getMember());
 			CompletableFuture<IGuildMember> gcf = event.getMessage().getMember().giveRole(event.getGuild().getRoleByID(rank.getID()));
 			gcf.thenAcceptAsync((nm) -> {
 				Main.logger.info("Fixed Player Rank Desync for " + event.getMessage().getMember());
