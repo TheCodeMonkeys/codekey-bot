@@ -1,10 +1,15 @@
 package codekey.main;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import com.google.gson.Gson;
 
 import codekey.level.CSVParser;
 import codekey.level.Player;
@@ -29,20 +34,23 @@ public class Main {
 	public static Map<Long, Player> players;
 	public static DiscLoader loader;
 
-	public static final String PREFIX = "c!";
+	public static final String PREFIX = "~";
 
+	
 	public static final Logger logger = new DLLogger("Codekey").getLogger();
 
+	public static Config config; // because having to change the PREFIX string every time I upload a new build it annoying 
+	
 	public static void main(String[] args) throws Exception {
 		try {
-			readToken();
+			readConfig();
 		} catch (IOException e) {
 			e.printStackTrace();
-			logger.severe("Failed to load the token.");
+			logger.severe("Failed to load the config file.");
 		}
 		new CSVParser(DATABASE);
 		// DLOptions options = new DLOptions(token);
-		loader = new DiscLoader(new DLOptions(token, PREFIX)).addEventListener(new Listener()).login().get();
+		loader = new DiscLoader(new DLOptions(config.auth.token, config.prefix)).addEventListener(new Listener()).login().get();
 		CommandRegistry.registerCommand(new CommandStatus(), "status");
 		// JDA jda = new
 		// JDABuilder(AccountType.BOT).setToken(token).addEventListener(new
@@ -51,11 +59,28 @@ public class Main {
 		// new SpamThread().start();
 	}
 
-	// This is probably the best way...
-	private static void readToken() throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(TOKEN_FILE));
-		token = reader.readLine();
-		reader.close();
+//	// This is probably the best way...
+//	private static void readToken() throws IOException {
+//		BufferedReader reader = new BufferedReader(new FileReader(TOKEN_FILE));
+//		token = reader.readLine();
+//		reader.close();
+//	}
+	
+	private static void readConfig() throws IOException {
+		Gson gson = new Gson();
+		File options = new File("options.json");
+		if (options.exists() && !options.isDirectory()) {
+			String content = "";
+			List<String> lines = Files.readAllLines(Paths.get("./options.json"));
+			for (String line : lines)
+				content += line;
+			config = gson.fromJson(content, Config.class);
+		} else if (!options.exists() || options.isDirectory()) {
+			config = new Config();
+			FileWriter fw = new FileWriter(options);
+			fw.write(gson.toJson(config));
+			fw.close();
+		}
 	}
 
 }
