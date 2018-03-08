@@ -15,3 +15,6 @@ logs/Tue Nov 21 08-14-56 MST 2017.log.lck
 *.DS_Store
 /logs/
 options.json
+/players.json
+*.json
+players.json

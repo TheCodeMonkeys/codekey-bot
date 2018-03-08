@@ -23,7 +23,7 @@ public class JSONThread extends Thread {
 					playerJSON.put("lastMsgID", player.getLastMsgID()).put("exp", player.getExp());
 					json.put(Long.toUnsignedString(id, 10), playerJSON);
 				});
-				fw.write(json.toString());
+				fw.write(json.toString(4));
 				fw.close();
 			} catch (Exception e) {
 				e.printStackTrace();

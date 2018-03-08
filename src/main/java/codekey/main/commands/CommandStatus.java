@@ -17,6 +17,7 @@ import io.discloader.discloader.entity.user.IUser;
 public class CommandStatus extends Command {
 
 	public CommandStatus() {
+		super();
 		setUnlocalizedName("status");
 		setDescription("Displays your player info.");
 	}

@@ -54,6 +54,15 @@ public class Listener extends EventListenerAdapter {
 		if (e.getMessage().getContent().toLowerCase().startsWith(Main.PREFIX + "status")) // don't give exp if the user is checking someones status
 			return;
 		long currentTime = System.currentTimeMillis();
+		Player p = Main.players.get(id);
+		// create new a player entry if an entry wasn't found in the players list.
+		if (p == null) {
+			// Fired if a person's ID doesn't already exist in my list. if so, then make a
+			// new entry and Add points to that person according to their role.
+			p = PlayerUtils.addNewPlayerEntryWithRank(id, e.getMessage().getMember().getRoles());
+			Main.logger.info("Registering new user (" + author.toString() + ") into the database");
+		}
+		p.setLastMsgID(e.getMessage().getID());
 		if (lastEXP.containsKey(id) && currentTime - lastEXP.get(id) < 60000) // if it's been less than a minute since the user received EXP return.
 			return;
 
@@ -66,16 +75,10 @@ public class Listener extends EventListenerAdapter {
 
 		// Adds exp to respective player with the formula EXP=WORDS/TOTAL_LENGTH with
 		// some adjustments
-		Player p = Main.players.get(id);
-		// create new a player entry if an entry wasn't found in the players list.
-		if (p == null) {
-			// Fired if a person's ID doesn't already exist in my list. if so, then make a
-			// new entry and Add points to that person according to their role.
-			p = PlayerUtils.addNewPlayerEntryWithRank(id, e.getMessage().getMember().getRoles());
-			Main.logger.info("Registering new user (" + author.toString() + ") into the database");
-		}
+
 		double exp = PlayerUtils.getEXPFromMessage(message.getContent());
 		p.addExp(exp, e);
+
 		Main.logger.info("Gave " + author + " " + exp + "EXP");
 		try {
 			// Once player gets the new score, update the database file.
@@ -99,14 +102,14 @@ public class Listener extends EventListenerAdapter {
 		writer.close();
 	}
 
-	protected void writeToJSON() throws IOException {
+	public static void writeToJSON() throws IOException {
 		FileWriter fw = new FileWriter(Main.DATABASE);
 		JSONObject json = new JSONObject(), playerJSON = new JSONObject(); // cache the playerJSON object instead of creating a new one for each player
 		Main.players.forEach((id, player) -> {
 			playerJSON.put("lastMsgID", player.getLastMsgID()).put("exp", player.getExp());
 			json.put(Long.toUnsignedString(id, 10), playerJSON);
 		});
-		fw.write(json.toString());
+		fw.write(json.toString(4));
 		fw.close();
 	}
 
