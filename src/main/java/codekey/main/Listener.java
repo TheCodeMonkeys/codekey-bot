@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 import codekey.level.Player;
 import codekey.level.PlayerUtils;
 import io.discloader.discloader.common.event.DisconnectEvent;
@@ -23,8 +25,6 @@ import io.discloader.discloader.entity.user.IUser;
  * https://discord.gg/PAH8y8W on 9/22/17.
  */
 public class Listener extends EventListenerAdapter {
-
-	public static ArrayList<IUser> lastMessage = new ArrayList<>();
 	/**
 	 * Map of the last time a user was given EXP indexed by the user's
 	 * {@link IUser#getID() id}
@@ -79,7 +79,7 @@ public class Listener extends EventListenerAdapter {
 		Main.logger.info("Gave " + author + " " + exp + "EXP");
 		try {
 			// Once player gets the new score, update the database file.
-			writeToCSV();
+			writeToJSON();
 		} catch (Exception ex) {
 			System.out.println("Unable to write file... Dming the creator");
 			ex.printStackTrace();
@@ -88,7 +88,7 @@ public class Listener extends EventListenerAdapter {
 		}
 	}
 
-	private void writeToCSV() throws IOException {
+	protected void writeToCSV() throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(Main.DATABASE));
 		List<Player> players = new ArrayList<>(Main.players.values());
 		for (int i = 0; i < players.size(); i++) {
@@ -99,15 +99,28 @@ public class Listener extends EventListenerAdapter {
 		writer.close();
 	}
 
+	protected void writeToJSON() throws IOException {
+		FileWriter fw = new FileWriter(Main.DATABASE);
+		JSONObject json = new JSONObject(), playerJSON = new JSONObject(); // cache the playerJSON object instead of creating a new one for each player
+		Main.players.forEach((id, player) -> {
+			playerJSON.put("lastMsgID", player.getLastMsgID()).put("exp", player.getExp());
+			json.put(Long.toUnsignedString(id, 10), playerJSON);
+		});
+		fw.write(json.toString());
+		fw.close();
+	}
+
 	public void Ready(ReadyEvent e) {
 		Main.logger.info("Codekey is now ready to communicate with Discord");
 	}
 
 	@Override
 	public void Disconnected(DisconnectEvent e) {
-		if (e.getClientFrame().getCloseCode() == 1007 || e.getServerFrame().getCloseCode() == 1007) {
-			System.exit(1);
-		}
+		Main.logger.severe("Got disconnected from the gateway");
+		// if (e.getClientFrame().getCloseCode() == 1007 ||
+		// e.getServerFrame().getCloseCode() == 1007) {
+		// System.exit(1);
+		// }
 	}
 
 }

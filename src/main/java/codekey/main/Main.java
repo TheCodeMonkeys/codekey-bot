@@ -4,16 +4,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 
-import codekey.level.CSVParser;
+import codekey.level.JSONParser;
 import codekey.level.Player;
 import codekey.main.commands.CommandStatus;
+import io.discloader.discloader.client.command.CommandHelp;
 import io.discloader.discloader.client.logger.DLLogger;
 import io.discloader.discloader.common.DLOptions;
 import io.discloader.discloader.common.DiscLoader;
@@ -26,52 +26,52 @@ import io.discloader.discloader.common.registry.CommandRegistry;
 public class Main {
 
 	public static String token;
-	public static final String DATABASE = "data.csv";
-	public static final String DATABASE_BACKUP = "data_backup.csv";
+	public static final String DATABASE = "players.json";
+	public static final String DATABASE_BACKUP = "players_backup.json";
 	// To avoid uploading my token to github, I am going to read it from a file.
-	private static final String TOKEN_FILE = "token.txt";
-	// data.csv contains the database.
+	private static final String CONFIG_FILE = "options.json";
+	// players.json contains the database.
 	public static Map<Long, Player> players;
 	public static DiscLoader loader;
 
 	public static final String PREFIX = "~";
 
-	
 	public static final Logger logger = new DLLogger("Codekey").getLogger();
 
-	public static Config config; // because having to change the PREFIX string every time I upload a new build it annoying 
-	
+	public static Config config; // because having to change the PREFIX string every time I upload a new build it
+									// annoying
+
 	public static void main(String[] args) throws Exception {
 		try {
 			readConfig();
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.severe("Failed to load the config file.");
+			System.exit(1);
 		}
-		new CSVParser(DATABASE);
+		new JSONParser(DATABASE);
 		// DLOptions options = new DLOptions(token);
-		loader = new DiscLoader(new DLOptions(config.auth.token, config.prefix)).addEventListener(new Listener()).login().get();
+		loader = new DiscLoader(new DLOptions(config.auth.token, config.prefix, false)).addEventListener(new Listener()).login().get();
 		CommandRegistry.registerCommand(new CommandStatus(), "status");
+		CommandRegistry.registerCommand(new CommandHelp(), "help");
 		// JDA jda = new
 		// JDABuilder(AccountType.BOT).setToken(token).addEventListener(new
 		// Listener()).buildBlocking();
-		new CSVThread().start();
+		new JSONThread().start();
 		// new SpamThread().start();
 	}
 
-//	// This is probably the best way...
-//	private static void readToken() throws IOException {
-//		BufferedReader reader = new BufferedReader(new FileReader(TOKEN_FILE));
-//		token = reader.readLine();
-//		reader.close();
-//	}
-	
+	/**
+	 * Reads the config file from disk
+	 * 
+	 * @throws IOException
+	 */
 	private static void readConfig() throws IOException {
 		Gson gson = new Gson();
-		File options = new File("options.json");
+		File options = new File(CONFIG_FILE);
 		if (options.exists() && !options.isDirectory()) {
-			String content = "";
-			List<String> lines = Files.readAllLines(Paths.get("./options.json"));
+			String content = ""; // something to concatenate the lines into
+			List<String> lines = Files.readAllLines(options.toPath()); // pretty self explanatory
 			for (String line : lines)
 				content += line;
 			config = gson.fromJson(content, Config.class);

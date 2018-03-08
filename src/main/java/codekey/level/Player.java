@@ -18,6 +18,7 @@ public class Player {
 	// private final IGuildMember member;
 	private double exp;
 	private Rank rank;
+	private long lastMsgID;
 
 	public Player(long id, double exp) {
 		this.id = id;
@@ -58,17 +59,38 @@ public class Player {
 			Main.logger.info("Attempting to fix Player Rank desync for " + event.getMessage().getMember());
 			CompletableFuture<IGuildMember> gcf = event.getMessage().getMember().giveRole(newRole);
 			gcf.thenAcceptAsync(nm -> {
-				
+
 			});
 		}
 
-//		if ((rank != Rank.NO_RANK && rank != Rank.UNKNOWN) && !event.getMessage().getMember().hasRole(newRole) && !event.getMessage().getMember().hasRole(event.getGuild().getRoleByID(Rank.STAFF.getID()))) {
-//			Main.logger.info("Attempting to fix Player Rank desync for " + event.getMessage().getMember());
-//			CompletableFuture<IGuildMember> gcf = event.getMessage().getMember().giveRole(event.getGuild().getRoleByID(rank.getID()));
-//			gcf.thenAcceptAsync((nm) -> {
-//				Main.logger.info("Fixed Player Rank Desync for " + event.getMessage().getMember());
-//			});
-//		}
+		// if ((rank != Rank.NO_RANK && rank != Rank.UNKNOWN) &&
+		// !event.getMessage().getMember().hasRole(newRole) &&
+		// !event.getMessage().getMember().hasRole(event.getGuild().getRoleByID(Rank.STAFF.getID())))
+		// {
+		// Main.logger.info("Attempting to fix Player Rank desync for " +
+		// event.getMessage().getMember());
+		// CompletableFuture<IGuildMember> gcf =
+		// event.getMessage().getMember().giveRole(event.getGuild().getRoleByID(rank.getID()));
+		// gcf.thenAcceptAsync((nm) -> {
+		// Main.logger.info("Fixed Player Rank Desync for " +
+		// event.getMessage().getMember());
+		// });
+		// }
+	}
+
+	/**
+	 * @return the lastMsgID
+	 */
+	public long getLastMsgID() {
+		return lastMsgID;
+	}
+
+	/**
+	 * @param lastMsgID
+	 *            the lastMsgID to set
+	 */
+	public void setLastMsgID(long lastMsgID) {
+		this.lastMsgID = lastMsgID;
 	}
 
 }

@@ -18,7 +18,7 @@ public class CommandStatus extends Command {
 
 	public CommandStatus() {
 		setUnlocalizedName("status");
-
+		setDescription("Displays your player info.");
 	}
 
 	@Override
