@@ -1,8 +1,8 @@
-package codekey.level;
+package codemonkeys.bots.codekey.level;
 
 import java.util.concurrent.CompletableFuture;
 
-import codekey.main.Main;
+import codemonkeys.bots.codekey.main.Main;
 import io.discloader.discloader.common.event.message.GuildMessageCreateEvent;
 import io.discloader.discloader.entity.guild.IGuild;
 import io.discloader.discloader.entity.guild.IGuildMember;

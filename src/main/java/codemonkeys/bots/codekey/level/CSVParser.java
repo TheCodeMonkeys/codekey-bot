@@ -1,11 +1,11 @@
-package codekey.level;
+package codemonkeys.bots.codekey.level;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
-import codekey.main.Main;
+import codemonkeys.bots.codekey.main.Main;
 import io.discloader.discloader.entity.util.SnowflakeUtil;
 
 /**

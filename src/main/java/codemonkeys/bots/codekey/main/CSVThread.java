@@ -1,11 +1,11 @@
-package codekey.main;
+package codemonkeys.bots.codekey.main;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import codekey.level.Player;
+import codemonkeys.bots.codekey.level.Player;
 
 /**
  * Created by thvardhan from codemonkeys discord server

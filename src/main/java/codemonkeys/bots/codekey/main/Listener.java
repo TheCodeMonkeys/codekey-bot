@@ -1,4 +1,4 @@
-package codekey.main;
+package codemonkeys.bots.codekey.main;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -10,8 +10,8 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import codekey.level.Player;
-import codekey.level.PlayerUtils;
+import codemonkeys.bots.codekey.level.Player;
+import codemonkeys.bots.codekey.level.PlayerUtils;
 import io.discloader.discloader.common.event.DisconnectEvent;
 import io.discloader.discloader.common.event.EventListenerAdapter;
 import io.discloader.discloader.common.event.ReadyEvent;

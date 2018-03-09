@@ -1,9 +1,9 @@
-package codekey.main.commands;
+package codemonkeys.bots.codekey.main.commands;
 
-import codekey.level.Player;
-import codekey.level.PlayerUtils;
-import codekey.level.Rank;
-import codekey.main.Main;
+import codemonkeys.bots.codekey.level.Player;
+import codemonkeys.bots.codekey.level.PlayerUtils;
+import codemonkeys.bots.codekey.level.Rank;
+import codemonkeys.bots.codekey.main.Main;
 import io.discloader.discloader.client.command.Command;
 import io.discloader.discloader.common.event.message.MessageCreateEvent;
 import io.discloader.discloader.core.entity.RichEmbed;

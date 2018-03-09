@@ -1,4 +1,4 @@
-package codekey.main.commands;
+package codemonkeys.bots.codekey.main.commands;
 
 import io.discloader.discloader.client.command.Command;
 import io.discloader.discloader.common.event.message.MessageCreateEvent;

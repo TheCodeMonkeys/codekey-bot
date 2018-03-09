@@ -1,4 +1,4 @@
-package codekey.level;
+package codemonkeys.bots.codekey.level;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import codekey.main.Main;
+import codemonkeys.bots.codekey.main.Main;
 import io.discloader.discloader.entity.util.SnowflakeUtil;
 
 public class JSONParser {

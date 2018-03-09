@@ -1,4 +1,4 @@
-package codekey.main;
+package codemonkeys.bots.codekey.main;
 
 import java.io.FileWriter;
 

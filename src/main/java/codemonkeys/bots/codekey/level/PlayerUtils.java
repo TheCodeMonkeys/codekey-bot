@@ -1,8 +1,8 @@
-package codekey.level;
+package codemonkeys.bots.codekey.level;
 
 import java.util.List;
 
-import codekey.main.Main;
+import codemonkeys.bots.codekey.main.Main;
 import io.discloader.discloader.entity.guild.IRole;
 
 /**

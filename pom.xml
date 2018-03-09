@@ -5,12 +5,11 @@
 	<groupId>codemonkeys.bots</groupId>
 	<artifactId>codekey</artifactId>
 	<packaging>jar</packaging>
-	<version>0.3.0</version>
+	<version>0.4.0</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<lwjgl.version>3.1.1</lwjgl.version>
 		<maven.build.timestamp.format>MMM.dd.yyyy</maven.build.timestamp.format>
 	</properties>
 
@@ -32,7 +31,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>codekey.main.Main</mainClass>
+							<mainClass>codemonkeys.bots.codekey.main.Main</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -69,7 +68,12 @@
 		<dependency>
 			<groupId>io.discloader</groupId>
 			<artifactId>discloader</artifactId>
-			<version>0.2.4</version>
+			<version>0.2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongodb-driver</artifactId>
+			<version>3.6.3</version>
 		</dependency>
 	</dependencies>
 	<repositories>

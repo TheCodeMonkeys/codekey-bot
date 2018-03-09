@@ -1,4 +1,4 @@
-package codekey.level;
+package codemonkeys.bots.codekey.level;
 
 /**
  * Created by thvardhan from codemonkeys discord server
