@@ -38,7 +38,7 @@ public class Main {
 
 	public static final String PREFIX = "~";
 
-	public static final Logger logger = new DLLogger("Codekey").getLogger();
+	public static final Logger logger = DLLogger.getLogger("Codekey");
 
 	public static Config config; // because having to change the PREFIX string every time I upload a new build it
 									// annoying
