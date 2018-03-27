@@ -63,8 +63,20 @@ public class Listener extends EventListenerAdapter {
 			Main.logger.info("Registering new user (" + author.toString() + ") into the database");
 		}
 		p.setLastMsgID(e.getMessage().getID());
-		if (lastEXP.containsKey(id) && currentTime - lastEXP.get(id) < 60000) // if it's been less than a minute since the user received EXP return.
+
+		if (lastEXP.containsKey(id) && currentTime - lastEXP.get(id) < 60000) {
+			// if it's been less than a minute since the user received EXP, write to JSON
+			// and return.
+			try {
+				// Once player gets the new score, update the database file.
+				writeToJSON();
+			} catch (Exception ex) {
+				System.out.println("Unable to write file... Dming the creator");
+				ex.printStackTrace();
+				EntityRegistry.getUserByID(104063667351322624l).sendMessage("Error: " + ex.getMessage());
+			}
 			return;
+		}
 
 		/*
 		 * If the program gets here, either the user's cooldown is over or, they haven't
@@ -87,7 +99,6 @@ public class Listener extends EventListenerAdapter {
 			System.out.println("Unable to write file... Dming the creator");
 			ex.printStackTrace();
 			EntityRegistry.getUserByID(104063667351322624l).sendMessage("Error: " + ex.getMessage());
-
 		}
 	}
 
@@ -103,16 +114,18 @@ public class Listener extends EventListenerAdapter {
 	}
 
 	public static void writeToJSON() throws IOException {
+		Main.logger.info("Saving Player Data");
 		FileWriter fw = new FileWriter(Main.DATABASE);
-		JSONObject json = new JSONObject(), playerJSON = new JSONObject(); // cache the playerJSON object instead of creating a new one for each player
+		JSONObject json = new JSONObject(); // cache the playerJSON object instead of creating a new one for each player
 		Main.players.forEach((id, player) -> {
-			playerJSON.put("lastMsgID", player.getLastMsgID()).put("exp", player.getExp());
+			JSONObject playerJSON = new JSONObject().put("lastMsgID", player.getLastMsgID()).put("exp", player.getExp());
 			json.put(Long.toUnsignedString(id, 10), playerJSON);
 		});
 		fw.write(json.toString(4));
 		fw.close();
 	}
 
+	@Override
 	public void Ready(ReadyEvent e) {
 		Main.logger.info("Codekey is now ready to communicate with Discord");
 	}
@@ -120,6 +133,7 @@ public class Listener extends EventListenerAdapter {
 	@Override
 	public void Disconnected(DisconnectEvent e) {
 		Main.logger.severe("Got disconnected from the gateway");
+		System.exit(0);
 		// if (e.getClientFrame().getCloseCode() == 1007 ||
 		// e.getServerFrame().getCloseCode() == 1007) {
 		// System.exit(1);

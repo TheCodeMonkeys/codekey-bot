@@ -1,8 +1,11 @@
 package codemonkeys.bots.codekey.main.commands;
 
+import java.io.IOException;
+
 import codemonkeys.bots.codekey.level.Player;
 import codemonkeys.bots.codekey.level.PlayerUtils;
 import codemonkeys.bots.codekey.level.Rank;
+import codemonkeys.bots.codekey.main.Listener;
 import codemonkeys.bots.codekey.main.Main;
 import io.discloader.discloader.client.command.Command;
 import io.discloader.discloader.common.event.message.MessageCreateEvent;
@@ -31,12 +34,17 @@ public class CommandStatus extends Command {
 		IUser user = message.getMentions().size() > 0 ? message.getMentions().getUsers().get(0) : message.getAuthor();
 
 		Player player = Main.players.get(user.getID());
-		// create new a player entry if an entry wasn't found in the players list 
+		// create new a player entry if an entry wasn't found in the players list
 		if (player == null) {
 			IGuild guild = message.getGuild();
 			if (guild == null || guild.getID() != 201544496654057472l) // if not run in a guild or the guild is not codemonkey's, return.
 				return;
 			player = PlayerUtils.addNewPlayerEntryWithRank(user.getID(), guild.getMember(user.getID()).getRoles()); // create the new entry and set player to the entry
+			try {
+				Listener.writeToJSON();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 		Rank current = PlayerUtils.getRankFromExp(player.getExp());
 		RichEmbed embed = new RichEmbed("Status").setAuthor(user.getUsername(), "", user.getAvatar().toString()).setColor(current.getColor());

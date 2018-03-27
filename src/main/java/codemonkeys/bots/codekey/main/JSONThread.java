@@ -1,10 +1,16 @@
 package codemonkeys.bots.codekey.main;
 
 import java.io.FileWriter;
+import java.util.logging.Logger;
 
 import org.json.JSONObject;
 
+import io.discloader.discloader.client.logger.DLLogger;
+
 public class JSONThread extends Thread {
+
+	public static Logger logger = DLLogger.getLogger(JSONThread.class);
+
 	@Override
 	public void run() {
 		super.run();
@@ -17,10 +23,11 @@ public class JSONThread extends Thread {
 				break;
 			}
 			try {
+				logger.info("Backing up player data");
 				FileWriter fw = new FileWriter(Main.DATABASE_BACKUP);
-				JSONObject json = new JSONObject(), playerJSON = new JSONObject(); // cache the playerJSON object instead of creating a new one for each player
+				JSONObject json = new JSONObject(); // cache the playerJSON object instead of creating a new one for each player
 				Main.players.forEach((id, player) -> {
-					playerJSON.put("lastMsgID", player.getLastMsgID()).put("exp", player.getExp());
+					JSONObject playerJSON = new JSONObject().put("lastMsgID", player.getLastMsgID()).put("exp", player.getExp());
 					json.put(Long.toUnsignedString(id, 10), playerJSON);
 				});
 				fw.write(json.toString(4));
