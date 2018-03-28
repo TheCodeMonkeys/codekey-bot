@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import org.json.JSONObject;
 
 import io.discloader.discloader.client.logger.DLLogger;
+import io.discloader.discloader.common.registry.EntityRegistry;
 
 public class JSONThread extends Thread {
 
@@ -24,6 +25,7 @@ public class JSONThread extends Thread {
 			}
 			try {
 				logger.info("Backing up player data");
+				DataBase.savePlayers(EntityRegistry.getGuildByID(Main.config.modLogs.guildID));
 				FileWriter fw = new FileWriter(Main.DATABASE_BACKUP);
 				JSONObject json = new JSONObject(); // cache the playerJSON object instead of creating a new one for each player
 				Main.players.forEach((id, player) -> {

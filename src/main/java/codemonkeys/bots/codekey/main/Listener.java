@@ -15,14 +15,20 @@ import codemonkeys.bots.codekey.level.PlayerUtils;
 import io.discloader.discloader.common.event.DisconnectEvent;
 import io.discloader.discloader.common.event.EventListenerAdapter;
 import io.discloader.discloader.common.event.ReadyEvent;
+import io.discloader.discloader.common.event.guild.member.GuildMemberRoleAddEvent;
 import io.discloader.discloader.common.event.message.GuildMessageCreateEvent;
 import io.discloader.discloader.common.registry.EntityRegistry;
+import io.discloader.discloader.core.entity.RichEmbed;
+import io.discloader.discloader.entity.auditlog.ActionTypes;
+import io.discloader.discloader.entity.auditlog.AuditLogChangeKeys;
+import io.discloader.discloader.entity.auditlog.IAuditLogEntry;
+import io.discloader.discloader.entity.guild.IGuild;
 import io.discloader.discloader.entity.message.IMessage;
 import io.discloader.discloader.entity.user.IUser;
 
 /**
- * Created by thvardhan from codemonkeys discord server
- * https://discord.gg/PAH8y8W on 9/22/17.
+ * Created by Thvardhan and maintained by R3alCl0ud from codemonkeys discord
+ * server https://discord.gg/PAH8y8W on 9/22/17.
  */
 public class Listener extends EventListenerAdapter {
 	/**
@@ -30,6 +36,55 @@ public class Listener extends EventListenerAdapter {
 	 * {@link IUser#getID() id}
 	 */
 	public static Map<Long, Long> lastEXP = new HashMap<>();
+
+	public static void writeToJSON() throws IOException {
+		Main.logger.info("Saving Player Data");
+		FileWriter fw = new FileWriter(Main.DATABASE);
+		JSONObject json = new JSONObject(); // cache the playerJSON object instead of creating a new one for each player
+		Main.players.forEach((id, player) -> {
+			JSONObject playerJSON = new JSONObject().put("lastMsgID", player.getLastMsgID()).put("exp", player.getExp());
+			json.put(Long.toUnsignedString(id, 10), playerJSON);
+		});
+		fw.write(json.toString(4));
+		fw.close();
+	}
+
+	@Override
+	public void Disconnected(DisconnectEvent e) {
+		Main.logger.severe("Got disconnected from the gateway");
+		System.exit(0);
+	}
+
+	@Override
+	public void GuildMemberRoleAdd(GuildMemberRoleAddEvent e) {
+		if (e.getRole().getID() == 295918777613287444l) {
+			System.out.println("Does this work?");
+			e.getGuild().getAuditLog(ActionTypes.MEMBER_ROLE_UPDATE, 1).thenAcceptAsync(aLogs -> {
+				try {
+					if (aLogs.getEntries().isEmpty())
+						return;
+					IAuditLogEntry entry = aLogs.getEntries().get(0);
+					for (int i = 0; i < entry.getChanges().size(); i++) {
+						if (entry.getChanges().get(i).getKey() == AuditLogChangeKeys.$ADD) {
+							List<Object> values = entry.getChanges().get(i).<ArrayList<Object>>getNewValue();
+							for (int n = 0; n < values.size(); n++) {
+								JSONObject value = (JSONObject) JSONObject.wrap(values.get(n));
+								if (Long.parseUnsignedLong(value.get("id").toString(), 10) == 295918777613287444l) {
+									RichEmbed embed = new RichEmbed("Theres a new Trashlord in Town").setColor(0x7384ce);
+									embed.addField("The Trashlord", e.getMember() + " (" + e.getMember().getID() + ") (" + e.getMember().asMention() + ")", true);
+									embed.addField("Deciding Moderator", entry.getAuthor(), true);
+									embed.setTimestamp();
+									e.getGuild().getTextChannelByID(203243917737459716l).sendEmbed(embed);
+								}
+							}
+						}
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			});
+		}
+	}
 
 	@Override
 	public void GuildMessageCreate(GuildMessageCreateEvent e) {
@@ -46,32 +101,33 @@ public class Listener extends EventListenerAdapter {
 		 * if (event.getMessage().getContent().startsWith(Main.PREFIX))
 		 * handleCommand(event.getMessage().getContent(), event);
 		 * 
-		 * If the user is a bot OR they are in spam timer OR its the spam channel then
-		 * ignore the message
+		 * If the user is a bot OR they are checking their status ignore them
 		 */
-		if (e.getMessage().getAuthor().isBot() || e.getChannel().getID() == 208003522157871124l)
-			return;
-		if (e.getMessage().getContent().toLowerCase().startsWith(Main.PREFIX + "status")) // don't give exp if the user is checking someones status
+		if (e.getMessage().getAuthor().isBot() || e.getMessage().getContent().toLowerCase().startsWith(Main.PREFIX + "status")) // don't give exp if the user is checking someones status
 			return;
 		long currentTime = System.currentTimeMillis();
-		Player p = Main.players.get(id);
+		Player player = Main.players.get(id);
 		// create new a player entry if an entry wasn't found in the players list.
-		if (p == null) {
+		if (player == null) {
 			// Fired if a person's ID doesn't already exist in my list. if so, then make a
 			// new entry and Add points to that person according to their role.
-			p = PlayerUtils.addNewPlayerEntryWithRank(id, e.getMessage().getMember().getRoles());
+			player = PlayerUtils.addNewPlayerEntryWithRank(id, e.getMessage().getMember().getRoles());
 			Main.logger.info("Registering new user (" + author.toString() + ") into the database");
 		}
-		p.setLastMsgID(e.getMessage().getID());
+		player.setLastMsgID(e.getMessage().getID());
 
-		if (lastEXP.containsKey(id) && currentTime - lastEXP.get(id) < 60000) {
+		player.checkForNewRank(e); // always check rank to force syncing
+
+		if ((lastEXP.containsKey(id) && currentTime - lastEXP.get(id) < 60000) || e.getChannel().getID() == 208003522157871124l) {
 			// if it's been less than a minute since the user received EXP, write to JSON
 			// and return.
 			try {
+
 				// Once player gets the new score, update the database file.
+				DataBase.savePlayer(e.getGuild(), player);
 				writeToJSON();
 			} catch (Exception ex) {
-				System.out.println("Unable to write file... Dming the creator");
+				System.out.println("Unable to save player data... Dming the creator");
 				ex.printStackTrace();
 				EntityRegistry.getUserByID(104063667351322624l).sendMessage("Error: " + ex.getMessage());
 			}
@@ -89,16 +145,32 @@ public class Listener extends EventListenerAdapter {
 		// some adjustments
 
 		double exp = PlayerUtils.getEXPFromMessage(message.getContent());
-		p.addExp(exp, e);
+		player.addExp(exp, e);
 
 		Main.logger.info("Gave " + author + " " + exp + "EXP");
 		try {
 			// Once player gets the new score, update the database file.
+			DataBase.savePlayer(e.getGuild(), player);
 			writeToJSON();
 		} catch (Exception ex) {
-			System.out.println("Unable to write file... Dming the creator");
+			System.out.println("Unable to save player data... Dming the creator");
 			ex.printStackTrace();
 			EntityRegistry.getUserByID(104063667351322624l).sendMessage("Error: " + ex.getMessage());
+		}
+	}
+
+	@Override
+	public void Ready(ReadyEvent e) {
+		Main.logger.info("Codekey is now ready to communicate with Discord");
+		Main.logger.info("Connecting to the DataBase if not already connected");
+		DataBase.connect();
+		IGuild guild = EntityRegistry.getGuildByID(Main.config.modLogs.guildID);
+		if (Main.players == null || Main.players.size() == 0) {
+			Main.logger.info("Loading Player Data");
+			DataBase.loadPlayers(guild);
+			Main.logger.info("Loaded " + Main.players.size() + " Player(s)");
+		} else if (Main.players != null) {
+			DataBase.savePlayers(guild);
 		}
 	}
 
@@ -111,33 +183,6 @@ public class Listener extends EventListenerAdapter {
 		}
 		writer.flush();
 		writer.close();
-	}
-
-	public static void writeToJSON() throws IOException {
-		Main.logger.info("Saving Player Data");
-		FileWriter fw = new FileWriter(Main.DATABASE);
-		JSONObject json = new JSONObject(); // cache the playerJSON object instead of creating a new one for each player
-		Main.players.forEach((id, player) -> {
-			JSONObject playerJSON = new JSONObject().put("lastMsgID", player.getLastMsgID()).put("exp", player.getExp());
-			json.put(Long.toUnsignedString(id, 10), playerJSON);
-		});
-		fw.write(json.toString(4));
-		fw.close();
-	}
-
-	@Override
-	public void Ready(ReadyEvent e) {
-		Main.logger.info("Codekey is now ready to communicate with Discord");
-	}
-
-	@Override
-	public void Disconnected(DisconnectEvent e) {
-		Main.logger.severe("Got disconnected from the gateway");
-		System.exit(0);
-		// if (e.getClientFrame().getCloseCode() == 1007 ||
-		// e.getServerFrame().getCloseCode() == 1007) {
-		// System.exit(1);
-		// }
 	}
 
 }

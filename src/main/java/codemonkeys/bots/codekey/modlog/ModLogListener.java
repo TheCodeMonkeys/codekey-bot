@@ -2,6 +2,7 @@ package codemonkeys.bots.codekey.modlog;
 
 import java.util.concurrent.CompletableFuture;
 
+import codemonkeys.bots.codekey.main.DataBase;
 import codemonkeys.bots.codekey.main.Main;
 import io.discloader.discloader.common.event.EventListenerAdapter;
 import io.discloader.discloader.common.event.ReadyEvent;
@@ -17,17 +18,17 @@ import io.discloader.discloader.entity.auditlog.IAuditLogEntry;
  * @author Perry Berman
  *
  */
-public class ModListener extends EventListenerAdapter {
-	
+public class ModLogListener extends EventListenerAdapter {
+
 	private long getNextCaseNumber() {
 		return DataBase.getLatestCaseNumber() + 1;
 	}
-	
+
 	@Override
 	public void Ready(ReadyEvent e) {
 		DataBase.connect();
 	}
-	
+
 	@Override
 	public void GuildBanAdd(GuildBanAddEvent e) {
 		if (e.getGuild().getID() != Main.config.modLogs.guildID) {
@@ -49,7 +50,7 @@ public class ModListener extends EventListenerAdapter {
 			}
 		});
 	}
-	
+
 	@Override
 	public void GuildBanRemove(GuildBanRemoveEvent e) {
 		if (e.getGuild().getID() != Main.config.modLogs.guildID) {
@@ -72,7 +73,7 @@ public class ModListener extends EventListenerAdapter {
 			}
 		});
 	}
-	
+
 	@Override
 	public void GuildMemberRemove(GuildMemberRemoveEvent e) {
 		if (e.getGuild().getID() != Main.config.modLogs.guildID) {
@@ -82,14 +83,16 @@ public class ModListener extends EventListenerAdapter {
 		cf.thenAcceptAsync(aLogs -> {
 			if (aLogs.getEntries().size() > 0) {
 				IAuditLogEntry entry = aLogs.getEntries().get(0);
+				System.out.println(entry.getTargetID());
 				if (entry.getTargetID() != e.getMember().getID()) { // make sure that the member was actually kicked
 					return; // and return early if they weren't
 				}
 				long caseNumber = getNextCaseNumber();
+				System.out.println(entry.getReason());
 				final String reason = entry.getReason() == null ? String.format("No reason provided. Use `!reason %d <reason>` to change the reason.", caseNumber) : entry.getReason();
 				RichEmbed embed = new RichEmbed().setAuthor("Member Kicked", "", e.getMember().getUser().getAvatar().toString());
 				embed.setColor(0x77a3ea).setFooter("Case #" + caseNumber).setTimestamp();
-				embed.addField("Member", String.format("%s (%d)", e.getMember(), e.getMember().getID()));
+				embed.addField("Member", String.format("%s (%d) (%s)", e.getMember(), e.getMember().getID(), e.getMember().asMention()));
 				embed.addField("Reason", reason);
 				embed.addField("Responsible Moderator", entry.getAuthor());
 				e.getGuild().getTextChannelByID(Main.config.modLogs.logsChannelID).sendEmbed(embed).thenAcceptAsync(msg -> {
@@ -102,5 +105,5 @@ public class ModListener extends EventListenerAdapter {
 			return null;
 		});
 	}
-	
+
 }

@@ -14,7 +14,7 @@ import codemonkeys.bots.codekey.level.JSONParser;
 import codemonkeys.bots.codekey.level.Player;
 import codemonkeys.bots.codekey.main.commands.CommandAuditLogs;
 import codemonkeys.bots.codekey.main.commands.CommandStatus;
-import codemonkeys.bots.codekey.modlog.ModListener;
+import codemonkeys.bots.codekey.modlog.ModLogListener;
 import codemonkeys.bots.codekey.modlog.commands.CommandReason;
 import io.discloader.discloader.client.command.CommandHelp;
 import io.discloader.discloader.client.logger.DLLogger;
@@ -32,7 +32,7 @@ public class Main {
 	public static final String DATABASE = "players.json";
 	public static final String DATABASE_BACKUP = "players_backup.json";
 	// To avoid uploading my token to github, I am going to read it from a file.
-	private static final String CONFIG_FILE = "options.json";
+	public static final String CONFIG_FILE = "options.json";
 	// players.json contains the database.
 	public static Map<Long, Player> players;
 	public static DiscLoader loader;
@@ -55,7 +55,7 @@ public class Main {
 		new JSONParser(DATABASE);
 		loader = new DiscLoader(new DLOptions(config.auth.token, config.prefix, false));
 		loader.addEventListener(new Listener());
-		loader.addEventListener(new ModListener());
+		loader.addEventListener(new ModLogListener());
 		loader.login();
 		CommandRegistry.registerCommand(new CommandStatus(), "status");
 		CommandRegistry.registerCommand(new CommandHelp(), "help");
@@ -80,10 +80,15 @@ public class Main {
 			config = gson.fromJson(content, Config.class);
 		} else if (!options.exists() || options.isDirectory()) {
 			config = new Config();
-			FileWriter fw = new FileWriter(options);
-			fw.write(gson.toJson(config));
-			fw.close();
+			writeConfig(options);
 		}
+	}
+
+	public static void writeConfig(File options) throws IOException {
+		Gson gson = new Gson();
+		FileWriter fw = new FileWriter(options);
+		fw.write(gson.toJson(config));
+		fw.close();
 	}
 
 }

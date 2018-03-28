@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 
 import codemonkeys.bots.codekey.main.Main;
 import io.discloader.discloader.common.event.message.GuildMessageCreateEvent;
+import io.discloader.discloader.common.registry.EntityRegistry;
 import io.discloader.discloader.entity.guild.IGuildMember;
 import io.discloader.discloader.entity.guild.IRole;
 
@@ -14,14 +15,18 @@ import io.discloader.discloader.entity.guild.IRole;
 public class Player {
 
 	private final long id;
-	// private final IGuildMember member;
 	private double exp;
 	private Rank rank;
 	private long lastMsgID;
 
 	public Player(long id, double exp) {
+		this(id, exp, 0l);
+	}
+
+	public Player(long id, double exp, long lastMSG) {
 		this.id = id;
 		this.exp = exp;
+		this.lastMsgID = lastMSG;
 		rank = PlayerUtils.getRankFromExp(exp);
 	}
 
@@ -30,16 +35,21 @@ public class Player {
 		checkForNewRank(event);
 	}
 
-	private void checkForNewRank(GuildMessageCreateEvent event) {
+	public void checkForNewRank(GuildMessageCreateEvent event) {
 		Rank newRank = PlayerUtils.getRankFromExp(exp); // get the rank they should have based on their EXP.
-		IRole newRole = event.getGuild().getRoleByID(newRank.getID()); // get the rank's role.
-		// Give the player the role if they don't have it and if the role isn't the
-		// staff role.
-		if (!event.getMessage().getMember().hasRole(newRole) && newRank != Rank.STAFF) {
+		IRole role = event.getGuild().getRoleByID(newRank.getID()); // get the rank's role.
+		// Give the role if they don't have it, if the role isn't the staff role.
+		if (!event.getMessage().getMember().hasRole(role) && newRank != Rank.STAFF) {
 			Main.logger.info("Attempting to give " + event.getMessage().getMember() + " the rank: " + newRank);
-			CompletableFuture<IGuildMember> gcf = event.getMessage().getMember().giveRole(newRole);
+			CompletableFuture<IGuildMember> gcf = event.getMessage().getMember().giveRole(role);
 			gcf.thenAcceptAsync(nm -> {
 				rank = newRank;
+			});
+			gcf.exceptionally(ex -> {
+				System.out.println("Unable to assign rank... Dming the creator");
+				ex.printStackTrace();
+				EntityRegistry.getUserByID(104063667351322624l).sendMessage("Error: " + ex.getMessage());
+				return event.getMessage().getMember();
 			});
 		}
 	}

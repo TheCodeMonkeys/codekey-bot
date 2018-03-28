@@ -3,9 +3,9 @@ package codemonkeys.bots.codekey.modlog.commands;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import codemonkeys.bots.codekey.main.DataBase;
 import codemonkeys.bots.codekey.main.Main;
 import codemonkeys.bots.codekey.modlog.Case;
-import codemonkeys.bots.codekey.modlog.DataBase;
 import io.discloader.discloader.client.command.Command;
 import io.discloader.discloader.common.event.message.MessageCreateEvent;
 import io.discloader.discloader.core.entity.RichEmbed;

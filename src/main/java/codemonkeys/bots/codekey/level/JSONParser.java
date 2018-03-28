@@ -1,7 +1,6 @@
 package codemonkeys.bots.codekey.level;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -29,11 +28,6 @@ public class JSONParser {
 				Main.players.put(playerID = SnowflakeUtil.parse(key), new Player(playerID, playerJSON.optDouble("exp", 0)));
 				Main.players.get(playerID).setLastMsgID(playerJSON.optLong("lastMsgID", 0l));
 			}
-		} else if (!file.exists()) {
-			FileWriter fw = new FileWriter(file);
-			fw.write(new JSONObject().toString());
-			fw.close();
 		}
 	}
-
 }
