@@ -10,9 +10,8 @@ import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 
-import codemonkeys.bots.codekey.level.JSONParser;
 import codemonkeys.bots.codekey.level.Player;
-import codemonkeys.bots.codekey.main.commands.CommandAuditLogs;
+import codemonkeys.bots.codekey.main.commands.CommandGiveEXP;
 import codemonkeys.bots.codekey.main.commands.CommandStatus;
 import codemonkeys.bots.codekey.modlog.ModLogListener;
 import codemonkeys.bots.codekey.modlog.commands.CommandReason;
@@ -39,10 +38,12 @@ public class Main {
 
 	public static final String PREFIX = "~";
 
-	public static final Logger logger = DLLogger.getLogger("Codekey");
+	public static final Logger logger = DLLogger.getLogger("CodeKey");
 
 	public static Config config; // because having to change the PREFIX string every time I upload a new build it
 									// annoying
+
+	public static final String[] fileExts = { ".java", ".c", ".cpp", ".js", ".py", ".vb", ".css", ".html", ".sh", ".bat", ".exe", ".msi", ".jar", ".cs", ".json", ".xml", ".hs", ".php", ".dll", ".deb", ".pak" };
 
 	public static void main(String[] args) throws Exception {
 		try {
@@ -52,15 +53,14 @@ public class Main {
 			logger.severe("Failed to load the config file.");
 			System.exit(1);
 		}
-		new JSONParser(DATABASE);
 		loader = new DiscLoader(new DLOptions(config.auth.token, config.prefix, false));
 		loader.addEventListener(new Listener());
 		loader.addEventListener(new ModLogListener());
 		loader.login();
-		CommandRegistry.registerCommand(new CommandStatus(), "status");
 		CommandRegistry.registerCommand(new CommandHelp(), "help");
+		CommandRegistry.registerCommand(new CommandGiveEXP(), "giveexp");
 		CommandRegistry.registerCommand(new CommandReason(), "reason");
-		CommandRegistry.registerCommand(new CommandAuditLogs(), "auditlogs");
+		CommandRegistry.registerCommand(new CommandStatus(), "status");
 		new JSONThread().start();
 	}
 
@@ -89,6 +89,14 @@ public class Main {
 		FileWriter fw = new FileWriter(options);
 		fw.write(gson.toJson(config));
 		fw.close();
+	}
+
+	public static int getYear() {
+		return 1970 + (int) (System.currentTimeMillis() / 31556952000l);
+	}
+
+	public static String getCopyright() {
+		return String.format("©Code Monkeys%s %d", fileExts[(int) Math.round(Math.random() * (fileExts.length - 1))], getYear());
 	}
 
 }

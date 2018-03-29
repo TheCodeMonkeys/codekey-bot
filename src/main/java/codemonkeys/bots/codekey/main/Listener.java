@@ -163,6 +163,7 @@ public class Listener extends EventListenerAdapter {
 	public void Ready(ReadyEvent e) {
 		Main.logger.info("Codekey is now ready to communicate with Discord");
 		Main.logger.info("Connecting to the DataBase if not already connected");
+		e.getLoader().getSelfUser().setListening("with a typewriter");
 		DataBase.connect();
 		IGuild guild = EntityRegistry.getGuildByID(Main.config.modLogs.guildID);
 		if (Main.players == null || Main.players.size() == 0) {
@@ -172,7 +173,20 @@ public class Listener extends EventListenerAdapter {
 		} else if (Main.players != null) {
 			DataBase.savePlayers(guild);
 		}
+		// this.r
 	}
+
+	// @Override
+	// public void RawPacket(RawEvent e) {
+	// if (e.isGateway()) {
+	// if (e.getFrame().getPayloadText().contains("MESSAGE_CREATE")) {
+	// new Thread(() -> {
+	// // UserJSON userData;
+	// System.out.println(e.getFrame().getPayloadText());
+	// }).start();
+	// }
+	// }
+	// }
 
 	protected void writeToCSV() throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(Main.DATABASE));

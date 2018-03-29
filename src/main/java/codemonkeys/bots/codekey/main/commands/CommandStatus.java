@@ -5,6 +5,7 @@ import java.io.IOException;
 import codemonkeys.bots.codekey.level.Player;
 import codemonkeys.bots.codekey.level.PlayerUtils;
 import codemonkeys.bots.codekey.level.Rank;
+import codemonkeys.bots.codekey.main.DataBase;
 import codemonkeys.bots.codekey.main.Listener;
 import codemonkeys.bots.codekey.main.Main;
 import io.discloader.discloader.client.command.Command;
@@ -41,6 +42,7 @@ public class CommandStatus extends Command {
 				return;
 			player = PlayerUtils.addNewPlayerEntryWithRank(user.getID(), guild.getMember(user.getID()).getRoles()); // create the new entry and set player to the entry
 			try {
+				DataBase.savePlayer(guild, player);
 				Listener.writeToJSON();
 			} catch (IOException e1) {
 				e1.printStackTrace();
@@ -51,7 +53,7 @@ public class CommandStatus extends Command {
 		embed.setDescription("Displaying User Status");
 		embed.addField("Current Rank", current, true).addField("Present EXP", (int) player.getExp(), true);
 		embed.addField("Next Rank", PlayerUtils.getNextRank(current), true).addField("EXP Needed", (int) PlayerUtils.expNeededForNextRank(player.getExp()), true);
-		embed.setFooter("© Code Monkeys.cpp 2017").setTimestamp();
+		embed.setFooter(Main.getCopyright()).setTimestamp();
 		e.getChannel().sendEmbed(embed);
 	}
 

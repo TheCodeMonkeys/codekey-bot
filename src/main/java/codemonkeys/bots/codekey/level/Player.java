@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import codemonkeys.bots.codekey.main.Main;
 import io.discloader.discloader.common.event.message.GuildMessageCreateEvent;
 import io.discloader.discloader.common.registry.EntityRegistry;
+import io.discloader.discloader.entity.guild.IGuild;
 import io.discloader.discloader.entity.guild.IGuildMember;
 import io.discloader.discloader.entity.guild.IRole;
 
@@ -35,6 +36,11 @@ public class Player {
 		checkForNewRank(event);
 	}
 
+	public void addExp(double exp, IGuild guild) {
+		this.exp += exp;
+		checkForNewRank(guild);
+	}
+
 	public void checkForNewRank(GuildMessageCreateEvent event) {
 		Rank newRank = PlayerUtils.getRankFromExp(exp); // get the rank they should have based on their EXP.
 		IRole role = event.getGuild().getRoleByID(newRank.getID()); // get the rank's role.
@@ -50,6 +56,26 @@ public class Player {
 				ex.printStackTrace();
 				EntityRegistry.getUserByID(104063667351322624l).sendMessage("Error: " + ex.getMessage());
 				return event.getMessage().getMember();
+			});
+		}
+	}
+
+	public void checkForNewRank(IGuild guild) {
+		Rank newRank = PlayerUtils.getRankFromExp(exp); // get the rank they should have based on their EXP.
+		IRole role = guild.getRoleByID(newRank.getID()); // get the rank's role.
+		IGuildMember member = guild.getMember(id);
+		// Give the role if they don't have it, if the role isn't the staff role.
+		if (!member.hasRole(role) && newRank != Rank.STAFF) {
+			Main.logger.info("Attempting to give " + member + " the rank: " + newRank);
+			CompletableFuture<IGuildMember> gcf = member.giveRole(role);
+			gcf.thenAcceptAsync(nm -> {
+				rank = newRank;
+			});
+			gcf.exceptionally(ex -> {
+				System.out.println("Unable to assign rank... Dming the creator");
+				ex.printStackTrace();
+				EntityRegistry.getUserByID(104063667351322624l).sendMessage("Error: " + ex.getMessage());
+				return member;
 			});
 		}
 	}
