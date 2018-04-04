@@ -14,6 +14,7 @@ import codemonkeys.bots.codekey.level.Player;
 import codemonkeys.bots.codekey.level.PlayerUtils;
 import io.discloader.discloader.common.event.DisconnectEvent;
 import io.discloader.discloader.common.event.EventListenerAdapter;
+import io.discloader.discloader.common.event.RawEvent;
 import io.discloader.discloader.common.event.ReadyEvent;
 import io.discloader.discloader.common.event.guild.member.GuildMemberRoleAddEvent;
 import io.discloader.discloader.common.event.message.GuildMessageCreateEvent;
@@ -163,7 +164,7 @@ public class Listener extends EventListenerAdapter {
 	public void Ready(ReadyEvent e) {
 		Main.logger.info("Codekey is now ready to communicate with Discord");
 		Main.logger.info("Connecting to the DataBase if not already connected");
-		e.getLoader().getSelfUser().setListening("with a typewriter");
+		e.getLoader().getSelfUser().setListening("a typewriter");
 		DataBase.connect();
 		IGuild guild = EntityRegistry.getGuildByID(Main.config.modLogs.guildID);
 		if (Main.players == null || Main.players.size() == 0) {
@@ -173,20 +174,18 @@ public class Listener extends EventListenerAdapter {
 		} else if (Main.players != null) {
 			DataBase.savePlayers(guild);
 		}
-		// this.r
 	}
 
-	// @Override
-	// public void RawPacket(RawEvent e) {
-	// if (e.isGateway()) {
-	// if (e.getFrame().getPayloadText().contains("MESSAGE_CREATE")) {
-	// new Thread(() -> {
-	// // UserJSON userData;
-	// System.out.println(e.getFrame().getPayloadText());
-	// }).start();
-	// }
-	// }
-	// }
+	@Override
+	public void RawPacket(RawEvent e) {
+		if (e.isGateway()) {
+			if (e.getFrame().getPayloadText().contains("GUILD_BAN") || e.getFrame().getPayloadText().contains("GUILD_MEMBER")) {
+				new Thread(() -> {
+					System.out.println(e.getFrame().getPayloadText());
+				}).start();
+			}
+		}
+	}
 
 	protected void writeToCSV() throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(Main.DATABASE));

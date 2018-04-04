@@ -37,6 +37,9 @@ public class ModLogListener extends EventListenerAdapter {
 		e.getGuild().getAuditLog(ActionTypes.MEMBER_BAN_ADD, 1).thenAcceptAsync(aLogs -> {
 			if (aLogs.getEntries().size() > 0) {
 				IAuditLogEntry entry = aLogs.getEntries().get(0);
+				if (entry.getTargetID() != e.getBannedUser().getID()) { // make sure that the member was actually kicked
+					return; // and return early if they weren't
+				}
 				long caseNumber = getNextCaseNumber();
 				final String reason = entry.getReason() == null ? String.format("No reason provided. Use `!reason <%d> <reason>` to change the reason.", caseNumber) : entry.getReason();
 				RichEmbed embed = new RichEmbed().setAuthor("Member Banned", "", e.getBannedUser().getAvatar().toString());
@@ -59,10 +62,12 @@ public class ModLogListener extends EventListenerAdapter {
 		e.getGuild().getAuditLog(ActionTypes.MEMBER_BAN_REMOVE, 1).thenAcceptAsync(aLogs -> {
 			if (aLogs.getEntries().size() > 0) {
 				IAuditLogEntry entry = aLogs.getEntries().get(0);
+				if (entry.getTargetID() != e.getUnbannedUser().getID()) { // make sure that the member was actually kicked
+					return; // and return early if they weren't
+				}
 				long caseNumber = getNextCaseNumber();
 				final String reason = entry.getReason() == null ? String.format("No reason provided. Use `!reason <%d> <reason>` to change the reason.", caseNumber) : entry.getReason();
 				RichEmbed embed = new RichEmbed().setAuthor("Member Unbanned", "", e.getUnbannedUser().getAvatar().toString());
-				System.out.println(e.getUnbannedUser().getAvatar());
 				embed.setColor(0x00ff00).setFooter("Case #" + caseNumber).setTimestamp();
 				embed.addField("Member", String.format("%s (%d)", e.getUnbannedUser(), e.getUnbannedUser().getID()));
 				embed.addField("Reason", reason);
@@ -83,12 +88,11 @@ public class ModLogListener extends EventListenerAdapter {
 		cf.thenAcceptAsync(aLogs -> {
 			if (aLogs.getEntries().size() > 0) {
 				IAuditLogEntry entry = aLogs.getEntries().get(0);
-				System.out.println(entry.getTargetID());
+				System.out.println(entry.getTargetID() + ":" + e.getMember().getID());
 				if (entry.getTargetID() != e.getMember().getID()) { // make sure that the member was actually kicked
 					return; // and return early if they weren't
 				}
 				long caseNumber = getNextCaseNumber();
-				System.out.println(entry.getReason());
 				final String reason = entry.getReason() == null ? String.format("No reason provided. Use `!reason %d <reason>` to change the reason.", caseNumber) : entry.getReason();
 				RichEmbed embed = new RichEmbed().setAuthor("Member Kicked", "", e.getMember().getUser().getAvatar().toString());
 				embed.setColor(0x77a3ea).setFooter("Case #" + caseNumber).setTimestamp();
