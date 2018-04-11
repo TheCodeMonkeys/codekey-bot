@@ -49,7 +49,7 @@ public class CommandGiveEXP extends Command {
 				player = PlayerUtils.addNewPlayerEntryWithRank(user.getID(), guild.getMember(user.getID()).getRoles());
 			}
 			currentEXP = player.getExp();
-			player.addExp(exp, guild);
+			player.addExp(exp, message);
 			DataBase.savePlayer(guild, player);
 			Rank current = player.getRank();
 			RichEmbed embed = new RichEmbed("EXP Given").setAuthor(user.getUsername(), "", user.getAvatar().toString()).setColor(current.getColor());

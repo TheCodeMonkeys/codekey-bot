@@ -24,6 +24,10 @@ public class ModLogListener extends EventListenerAdapter {
 		return DataBase.getLatestCaseNumber() + 1;
 	}
 
+	private String getReasonText(long caseNumber) {
+		return String.format("No reason provided. Use `%sreason <%d> <reason>` to change the reason.", Main.config.prefix, caseNumber);
+	}
+
 	@Override
 	public void Ready(ReadyEvent e) {
 		DataBase.connect();
@@ -41,10 +45,10 @@ public class ModLogListener extends EventListenerAdapter {
 					return; // and return early if they weren't
 				}
 				long caseNumber = getNextCaseNumber();
-				final String reason = entry.getReason() == null ? String.format("No reason provided. Use `!reason <%d> <reason>` to change the reason.", caseNumber) : entry.getReason();
-				RichEmbed embed = new RichEmbed().setAuthor("Member Banned", "", e.getBannedUser().getAvatar().toString());
+				final String reason = entry.getReason() == null ? getReasonText(caseNumber) : entry.getReason();
+				RichEmbed embed = new RichEmbed().setAuthor("Member Banned", "", aLogs.getUsers().get(entry.getTargetID()).getAvatar().toString());
 				embed.setColor(0xd0021b).setFooter("Case #" + caseNumber).setTimestamp();
-				embed.addField("Member", String.format("%s (%d)", e.getBannedUser(), e.getBannedUser().getID()));
+				embed.addField("Member", String.format("%s (%d) (%s)", e.getBannedUser(), e.getBannedUser().getID(), e.getBannedUser()));
 				embed.addField("Reason", reason);
 				embed.addField("Responsible Moderator", entry.getAuthor());
 				e.getGuild().getTextChannelByID(Main.config.modLogs.logsChannelID).sendEmbed(embed).thenAcceptAsync(msg -> {
@@ -66,10 +70,10 @@ public class ModLogListener extends EventListenerAdapter {
 					return; // and return early if they weren't
 				}
 				long caseNumber = getNextCaseNumber();
-				final String reason = entry.getReason() == null ? String.format("No reason provided. Use `!reason <%d> <reason>` to change the reason.", caseNumber) : entry.getReason();
-				RichEmbed embed = new RichEmbed().setAuthor("Member Unbanned", "", e.getUnbannedUser().getAvatar().toString());
+				final String reason = entry.getReason() == null ? getReasonText(caseNumber) : entry.getReason();
+				RichEmbed embed = new RichEmbed().setAuthor("Member Unbanned", "", aLogs.getUsers().get(entry.getTargetID()).getAvatar().toString());
 				embed.setColor(0x00ff00).setFooter("Case #" + caseNumber).setTimestamp();
-				embed.addField("Member", String.format("%s (%d)", e.getUnbannedUser(), e.getUnbannedUser().getID()));
+				embed.addField("Member", String.format("%s (%d) (%s)", e.getUnbannedUser(), e.getUnbannedUser().getID(), e.getUnbannedUser().asMention()));
 				embed.addField("Reason", reason);
 				embed.addField("Responsible Moderator", entry.getAuthor());
 				e.getGuild().getTextChannelByID(Main.config.modLogs.logsChannelID).sendEmbed(embed).thenAcceptAsync(msg -> {
@@ -93,8 +97,9 @@ public class ModLogListener extends EventListenerAdapter {
 					return; // and return early if they weren't
 				}
 				long caseNumber = getNextCaseNumber();
-				final String reason = entry.getReason() == null ? String.format("No reason provided. Use `!reason %d <reason>` to change the reason.", caseNumber) : entry.getReason();
-				RichEmbed embed = new RichEmbed().setAuthor("Member Kicked", "", e.getMember().getUser().getAvatar().toString());
+
+				final String reason = entry.getReason() == null ? getReasonText(caseNumber) : entry.getReason();
+				RichEmbed embed = new RichEmbed().setAuthor("Member Kicked", "", aLogs.getUsers().get(entry.getTargetID()).getAvatar().toString());
 				embed.setColor(0x77a3ea).setFooter("Case #" + caseNumber).setTimestamp();
 				embed.addField("Member", String.format("%s (%d) (%s)", e.getMember(), e.getMember().getID(), e.getMember().asMention()));
 				embed.addField("Reason", reason);

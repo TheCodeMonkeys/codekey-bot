@@ -8,6 +8,8 @@ import io.discloader.discloader.common.registry.EntityRegistry;
 import io.discloader.discloader.entity.guild.IGuild;
 import io.discloader.discloader.entity.guild.IGuildMember;
 import io.discloader.discloader.entity.guild.IRole;
+import io.discloader.discloader.entity.message.IMessage;
+import io.discloader.discloader.entity.message.MessageBuilder;
 
 /**
  * Created by thvardhan from codemonkeys discord server
@@ -36,20 +38,27 @@ public class Player {
 		checkForNewRank(event);
 	}
 
-	public void addExp(double exp, IGuild guild) {
+	public void addExp(double exp, IMessage message) {
 		this.exp += exp;
-		checkForNewRank(guild);
+		checkForNewRank(message);
 	}
 
 	public void checkForNewRank(GuildMessageCreateEvent event) {
 		Rank newRank = PlayerUtils.getRankFromExp(exp); // get the rank they should have based on their EXP.
-		IRole role = event.getGuild().getRoleByID(newRank.getID()); // get the rank's role.
+		IGuild guild = event.getGuild(); // get the guild we are in
+		IRole role = guild.getRoleByID(newRank.getID()); // get the rank's role.
+
 		// Give the role if they don't have it, if the role isn't the staff role.
-		if (!event.getMessage().getMember().hasRole(role) && newRank != Rank.STAFF) {
-			Main.logger.info("Attempting to give " + event.getMessage().getMember() + " the rank: " + newRank);
-			CompletableFuture<IGuildMember> gcf = event.getMessage().getMember().giveRole(role);
+		IGuildMember member = guild.getMember(id);
+		if (!member.hasRole(role) && newRank != Rank.STAFF) {
+			Main.logger.info("Attempting to give " + member + " the rank: " + newRank);
+			CompletableFuture<IGuildMember> gcf = member.giveRole("Assigning Rank", role);
 			gcf.thenAcceptAsync(nm -> {
+				MessageBuilder builder = new MessageBuilder(event.getChannel());
+				builder.append("Congraduations! ").mention(member).append(". You have ranked up to ").code(newRank.name());
+				builder.append(" from ").code(rank.name());
 				rank = newRank;
+				builder.sendMessage();
 			});
 			gcf.exceptionally(ex -> {
 				System.out.println("Unable to assign rank... Dming the creator");
@@ -60,16 +69,21 @@ public class Player {
 		}
 	}
 
-	public void checkForNewRank(IGuild guild) {
+	public void checkForNewRank(IMessage message) {
+		IGuild guild = message.getGuild();
 		Rank newRank = PlayerUtils.getRankFromExp(exp); // get the rank they should have based on their EXP.
 		IRole role = guild.getRoleByID(newRank.getID()); // get the rank's role.
 		IGuildMember member = guild.getMember(id);
 		// Give the role if they don't have it, if the role isn't the staff role.
 		if (!member.hasRole(role) && newRank != Rank.STAFF) {
 			Main.logger.info("Attempting to give " + member + " the rank: " + newRank);
-			CompletableFuture<IGuildMember> gcf = member.giveRole(role);
+			CompletableFuture<IGuildMember> gcf = member.giveRole("Assigning Rank", role);
 			gcf.thenAcceptAsync(nm -> {
+				MessageBuilder builder = new MessageBuilder(message.getChannel());
+				builder.append("Congraduations! ").mention(member).append(". You have ranked up to ").code(newRank.name());
+				builder.append(" from ").code(rank.name());
 				rank = newRank;
+				builder.sendMessage();
 			});
 			gcf.exceptionally(ex -> {
 				System.out.println("Unable to assign rank... Dming the creator");
