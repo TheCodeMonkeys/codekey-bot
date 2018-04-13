@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import codemonkeys.bots.codekey.level.Player;
 import codemonkeys.bots.codekey.level.PlayerUtils;
+import io.discloader.discloader.client.command.CommandHandler;
 import io.discloader.discloader.common.event.DisconnectEvent;
 import io.discloader.discloader.common.event.EventListenerAdapter;
 import io.discloader.discloader.common.event.RawEvent;
@@ -72,7 +73,7 @@ public class Listener extends EventListenerAdapter {
 								JSONObject value = (JSONObject) JSONObject.wrap(values.get(n));
 								if (Long.parseUnsignedLong(value.get("id").toString(), 10) == 295918777613287444l) {
 									RichEmbed embed = new RichEmbed("Theres a new Trashlord in Town").setColor(0x7384ce);
-									embed.addField("The Trashlord", e.getMember() + " (" + e.getMember().getID() + ") (" + e.getMember().asMention() + ")", true);
+									embed.addField("The Trashlord", e.getMember() + " (" + e.getMember().getID() + ") (" + e.getMember().toMention() + ")", true);
 									embed.addField("Deciding Moderator", entry.getAuthor(), true);
 									embed.setTimestamp();
 									e.getGuild().getTextChannelByID(203243917737459716l).sendEmbed(embed);
@@ -164,7 +165,7 @@ public class Listener extends EventListenerAdapter {
 	public void Ready(ReadyEvent e) {
 		Main.logger.info("Codekey is now ready to communicate with Discord");
 		Main.logger.info("Connecting to the DataBase if not already connected");
-		e.getLoader().getSelfUser().setListening("a typewriter");
+		e.getLoader().getSelfUser().setGame(CommandHandler.prefix + "help || " + CommandHandler.prefix + "status");
 		DataBase.connect();
 		IGuild guild = EntityRegistry.getGuildByID(Main.config.modLogs.guildID);
 		if (Main.players == null || Main.players.size() == 0) {

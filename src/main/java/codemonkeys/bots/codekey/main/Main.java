@@ -44,6 +44,7 @@ public class Main {
 									// annoying
 
 	public static final String[] fileExts = { ".java", ".c", ".cpp", ".js", ".py", ".vb", ".css", ".html", ".sh", ".bat", ".exe", ".msi", ".jar", ".cs", ".json", ".xml", ".hs", ".php", ".dll", ".deb", ".pak" };
+	public static Thread jsonThread;
 
 	public static void main(String[] args) throws Exception {
 		try {
@@ -56,12 +57,14 @@ public class Main {
 		loader = new DiscLoader(new DLOptions(config.auth.token, config.prefix, false));
 		loader.addEventListener(new Listener());
 		loader.addEventListener(new ModLogListener());
-		loader.login();
+		loader.login().thenAcceptAsync((dl) -> {
+			(jsonThread = new JSONThread()).start();
+		});
 		CommandRegistry.registerCommand(new CommandHelp(), "help");
 		CommandRegistry.registerCommand(new CommandGiveEXP(), "giveexp");
 		CommandRegistry.registerCommand(new CommandReason(), "reason");
 		CommandRegistry.registerCommand(new CommandStatus(), "status");
-		new JSONThread().start();
+
 	}
 
 	/**

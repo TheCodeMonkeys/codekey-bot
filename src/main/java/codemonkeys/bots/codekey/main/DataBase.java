@@ -55,7 +55,7 @@ public class DataBase {
 	}
 
 	public static void loadPlayers(IGuild guild) {
-		if (Main.players == null) {
+		if (Main.players == null || guild == null) {
 			Main.players = new HashMap<>();
 		}
 		getPlayers(guild).forEach(player -> {
@@ -64,7 +64,7 @@ public class DataBase {
 	}
 
 	public static void savePlayers(IGuild guild) {
-		if (Main.players == null) {
+		if (Main.players == null || guild == null) {
 			return;
 		}
 		Main.players.forEach((pID, player) -> {

@@ -73,7 +73,7 @@ public class ModLogListener extends EventListenerAdapter {
 				final String reason = entry.getReason() == null ? getReasonText(caseNumber) : entry.getReason();
 				RichEmbed embed = new RichEmbed().setAuthor("Member Unbanned", "", aLogs.getUsers().get(entry.getTargetID()).getAvatar().toString());
 				embed.setColor(0x00ff00).setFooter("Case #" + caseNumber).setTimestamp();
-				embed.addField("Member", String.format("%s (%d) (%s)", e.getUnbannedUser(), e.getUnbannedUser().getID(), e.getUnbannedUser().asMention()));
+				embed.addField("Member", String.format("%s (%d) (%s)", e.getUnbannedUser(), e.getUnbannedUser().getID(), e.getUnbannedUser().toMention()));
 				embed.addField("Reason", reason);
 				embed.addField("Responsible Moderator", entry.getAuthor());
 				e.getGuild().getTextChannelByID(Main.config.modLogs.logsChannelID).sendEmbed(embed).thenAcceptAsync(msg -> {
@@ -101,7 +101,7 @@ public class ModLogListener extends EventListenerAdapter {
 				final String reason = entry.getReason() == null ? getReasonText(caseNumber) : entry.getReason();
 				RichEmbed embed = new RichEmbed().setAuthor("Member Kicked", "", aLogs.getUsers().get(entry.getTargetID()).getAvatar().toString());
 				embed.setColor(0x77a3ea).setFooter("Case #" + caseNumber).setTimestamp();
-				embed.addField("Member", String.format("%s (%d) (%s)", e.getMember(), e.getMember().getID(), e.getMember().asMention()));
+				embed.addField("Member", String.format("%s (%d) (%s)", e.getMember(), e.getMember().getID(), e.getMember().toMention()));
 				embed.addField("Reason", reason);
 				embed.addField("Responsible Moderator", entry.getAuthor());
 				e.getGuild().getTextChannelByID(Main.config.modLogs.logsChannelID).sendEmbed(embed).thenAcceptAsync(msg -> {

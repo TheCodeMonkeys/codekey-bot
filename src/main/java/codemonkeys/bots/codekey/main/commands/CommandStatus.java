@@ -23,7 +23,8 @@ public class CommandStatus extends Command {
 	public CommandStatus() {
 		super();
 		setUnlocalizedName("status");
-		setDescription("Displays your player info.");
+		setDescription("Displays your or the mentioned user's player info.");
+		setUsage("status [@user]");
 	}
 
 	@Override
