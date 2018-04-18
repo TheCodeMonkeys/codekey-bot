@@ -24,7 +24,8 @@ public class CommandGiveEXP extends Command {
 		setArgsRegex("<@\\d+> ?(-?\\d+\\.?\\d+)");
 		setUsage("giveexp <@user [@user]> <exp>");
 		setDescription("Gives the mentioned user exp");
-		this.setFullDescription("Gives the mentioned user exp.\nGiving someone a negative amount of EXP will take EXP away from them.");
+		setFullDescription("Gives the mentioned user exp.\nGiving someone a negative amount of EXP will take EXP away from them.");
+		setTextureName("codekey:giveexp");
 	}
 
 	public void execute(MessageCreateEvent e, String[] ignored) {

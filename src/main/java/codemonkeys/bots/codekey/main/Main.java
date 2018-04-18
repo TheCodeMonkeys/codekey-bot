@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -16,8 +17,11 @@ import codemonkeys.bots.codekey.main.commands.CommandStatus;
 import codemonkeys.bots.codekey.modlog.ModLogListener;
 import codemonkeys.bots.codekey.modlog.commands.CommandReason;
 import io.discloader.discloader.client.command.CommandHelp;
+import io.discloader.discloader.client.render.util.Resource;
 import io.discloader.discloader.common.DLOptions;
 import io.discloader.discloader.common.DiscLoader;
+import io.discloader.discloader.common.language.Language;
+import io.discloader.discloader.common.language.LanguageRegistry;
 import io.discloader.discloader.common.logger.DLLogger;
 import io.discloader.discloader.common.registry.CommandRegistry;
 import io.discloader.discloader.common.registry.EntityRegistry;
@@ -47,6 +51,8 @@ public class Main {
 
 	public static final String[] fileExts = { ".java", ".c", ".cpp", ".js", ".py", ".vb", ".css", ".html", ".sh", ".bat", ".exe", ".msi", ".jar", ".cs", ".json", ".xml", ".hs", ".php", ".dll", ".deb", ".pak" };
 	public static Thread jsonThread;
+
+	public static final Language enUS = new Language(new Resource("codekey", "lang/en-US.lang").getResourceAsStream(), Locale.US);
 
 	public static String getCopyright() {
 		return String.format("©Code Monkeys%s %d", fileExts[(int) Math.round(Math.random() * (fileExts.length - 1))], getYear());
@@ -78,6 +84,7 @@ public class Main {
 		CommandRegistry.registerCommand(new CommandGiveEXP(), "giveexp");
 		CommandRegistry.registerCommand(new CommandReason(), "reason");
 		CommandRegistry.registerCommand(new CommandStatus(), "status");
+		LanguageRegistry.registerLanguage(enUS);
 	}
 
 	/**

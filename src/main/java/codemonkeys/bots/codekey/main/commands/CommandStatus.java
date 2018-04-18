@@ -25,6 +25,7 @@ public class CommandStatus extends Command {
 		setUnlocalizedName("status");
 		setDescription("Displays your or the mentioned user's player info.");
 		setUsage("status [@user]");
+		setTextureName("codekey:status");
 	}
 
 	@Override

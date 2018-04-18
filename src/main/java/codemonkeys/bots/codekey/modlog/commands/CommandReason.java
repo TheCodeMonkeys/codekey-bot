@@ -21,17 +21,17 @@ import io.discloader.discloader.entity.util.SnowflakeUtil;
  *
  */
 public class CommandReason extends Command {
-	
+
 	private final String regex = " *(\\d*-?\\d*|latest) (.*)";
 	private final Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
-	
+
 	public CommandReason() {
 		setUnlocalizedName("reason");
 		setUsage("reason <casenumber[-casenumber]> <reason>");
 		setDescription("Sets the reason of a case in the modlog");
-		
+		setTextureName("codekey:reason");
 	}
-	
+
 	@Override
 	public void execute(MessageCreateEvent e, String[] args) throws Exception {
 		if (e.getMessage().getGuild() != null || e.getMessage().getGuild().getID() == Main.config.modLogs.guildID) {
@@ -82,7 +82,7 @@ public class CommandReason extends Command {
 		}
 		e.getMessage().delete();
 	}
-	
+
 	@Override
 	public boolean shouldExecute(IGuildMember member, IGuildTextChannel channel) {
 		return member.getPermissions().hasAny(Permissions.BAN_MEMBERS, Permissions.KICK_MEMBERS);
