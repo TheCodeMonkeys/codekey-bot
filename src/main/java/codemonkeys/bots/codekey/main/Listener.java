@@ -167,20 +167,22 @@ public class Listener extends EventListenerAdapter {
 		Main.logger.info("Connecting to the DataBase if not already connected");
 		e.getLoader().getSelfUser().setGame(CommandHandler.prefix + "help || " + CommandHandler.prefix + "status");
 		DataBase.connect();
-		IGuild guild = EntityRegistry.getGuildByID(Main.config.modLogs.guildID);
-		if (Main.players == null || Main.players.size() == 0) {
-			Main.logger.info("Loading Player Data");
-			DataBase.loadPlayers(guild);
-			Main.logger.info("Loaded " + Main.players.size() + " Player(s)");
-		} else if (Main.players != null) {
-			DataBase.savePlayers(guild);
-		}
+		IGuild guild = Main.getGuild();
+		guild.fetchMembers().thenAccept(members -> {
+			if (Main.players == null || Main.players.size() == 0) {
+				Main.logger.info("Loading Player Data");
+				DataBase.loadPlayers(guild);
+				Main.logger.info("Loaded " + Main.players.size() + " Player(s)");
+			} else if (Main.players != null) {
+				DataBase.savePlayers(guild);
+			}
+		});
 	}
 
 	@Override
 	public void RawPacket(RawEvent e) {
 		if (e.isGateway()) {
-			if (e.getFrame().getPayloadText().contains("GUILD_BAN") || e.getFrame().getPayloadText().contains("GUILD_MEMBER")) {
+			if (e.getFrame().getPayloadText().contains("GUILD_BAN") || (e.getFrame().getPayloadText().contains("GUILD_MEMBER") && !e.getFrame().getPayloadText().contains("GUILD_MEMBERS_CHUNK"))) {
 				new Thread(() -> {
 					System.out.println(e.getFrame().getPayloadText());
 				}).start();

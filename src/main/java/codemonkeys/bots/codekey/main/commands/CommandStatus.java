@@ -50,7 +50,7 @@ public class CommandStatus extends Command {
 			}
 		}
 		Rank current = PlayerUtils.getRankFromExp(player.getExp());
-		RichEmbed embed = new RichEmbed("Status").setAuthor(user.getUsername(), "", user.getAvatar().toString()).setColor(current.getColor());
+		RichEmbed embed = new RichEmbed("Status").setAuthor(user.getUsername(), "", user.getAvatar().toString()).setColor(player.getColor());
 		embed.setDescription("Displaying User Status");
 		embed.addField("Current Rank", current, true).addField("Present EXP", (int) player.getExp(), true);
 		embed.addField("Next Rank", PlayerUtils.getNextRank(current), true).addField("EXP Needed", (int) PlayerUtils.expNeededForNextRank(player.getExp()), true);

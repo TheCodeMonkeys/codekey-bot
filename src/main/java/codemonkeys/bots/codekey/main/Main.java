@@ -20,6 +20,8 @@ import io.discloader.discloader.common.DLOptions;
 import io.discloader.discloader.common.DiscLoader;
 import io.discloader.discloader.common.logger.DLLogger;
 import io.discloader.discloader.common.registry.CommandRegistry;
+import io.discloader.discloader.common.registry.EntityRegistry;
+import io.discloader.discloader.entity.guild.IGuild;
 
 /**
  * Created by thvardhan from codemonkeys discord server
@@ -46,6 +48,18 @@ public class Main {
 	public static final String[] fileExts = { ".java", ".c", ".cpp", ".js", ".py", ".vb", ".css", ".html", ".sh", ".bat", ".exe", ".msi", ".jar", ".cs", ".json", ".xml", ".hs", ".php", ".dll", ".deb", ".pak" };
 	public static Thread jsonThread;
 
+	public static String getCopyright() {
+		return String.format("©Code Monkeys%s %d", fileExts[(int) Math.round(Math.random() * (fileExts.length - 1))], getYear());
+	}
+
+	public static IGuild getGuild() {
+		return EntityRegistry.getGuildByID(config.guildID);
+	}
+
+	public static int getYear() {
+		return 1970 + (int) (System.currentTimeMillis() / 31556952000l);
+	}
+
 	public static void main(String[] args) throws Exception {
 		try {
 			readConfig();
@@ -64,7 +78,6 @@ public class Main {
 		CommandRegistry.registerCommand(new CommandGiveEXP(), "giveexp");
 		CommandRegistry.registerCommand(new CommandReason(), "reason");
 		CommandRegistry.registerCommand(new CommandStatus(), "status");
-
 	}
 
 	/**
@@ -92,14 +105,6 @@ public class Main {
 		FileWriter fw = new FileWriter(options);
 		fw.write(gson.toJson(config));
 		fw.close();
-	}
-
-	public static int getYear() {
-		return 1970 + (int) (System.currentTimeMillis() / 31556952000l);
-	}
-
-	public static String getCopyright() {
-		return String.format("©Code Monkeys%s %d", fileExts[(int) Math.round(Math.random() * (fileExts.length - 1))], getYear());
 	}
 
 }

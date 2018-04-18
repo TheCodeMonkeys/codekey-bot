@@ -50,16 +50,18 @@ public class Player {
 
 		// Give the role if they don't have it, if the role isn't the staff role.
 		IGuildMember member = guild.getMember(id);
-		if (!member.hasRole(role) && newRank != Rank.STAFF) {
+		if (!member.hasRole(role) && (newRank != Rank.STAFF && newRank != Rank.NO_RANK && newRank != Rank.UNKNOWN)) {
 			Main.logger.info("Attempting to give " + member + " the rank: " + newRank);
 			CompletableFuture<IGuildMember> gcf = member.giveRole("Assigning Rank", role);
-			gcf.thenAcceptAsync(nm -> {
-				MessageBuilder builder = new MessageBuilder(event.getChannel());
-				builder.append("Congraduations! ").mention(member).append(". You have ranked up to ").code(newRank.name());
-				builder.append(" from ").code(rank.name());
-				rank = newRank;
-				builder.sendMessage();
-			});
+			if (rank != newRank) {
+				gcf.thenAcceptAsync(nm -> {
+					MessageBuilder builder = new MessageBuilder(event.getChannel());
+					builder.append("Congraduations! ").mention(member).append(". You have ranked up to ").code(newRank.name());
+					builder.append(" from ").code(rank.name());
+					rank = newRank;
+					builder.sendMessage();
+				});
+			}
 			gcf.exceptionally(ex -> {
 				System.out.println("Unable to assign rank... Dming the creator");
 				ex.printStackTrace();
@@ -75,16 +77,19 @@ public class Player {
 		IRole role = guild.getRoleByID(newRank.getID()); // get the rank's role.
 		IGuildMember member = guild.getMember(id);
 		// Give the role if they don't have it, if the role isn't the staff role.
-		if (!member.hasRole(role) && newRank != Rank.STAFF) {
+		if (!member.hasRole(role) && (newRank != Rank.STAFF && newRank != Rank.NO_RANK && newRank != Rank.UNKNOWN)) {
 			Main.logger.info("Attempting to give " + member + " the rank: " + newRank);
 			CompletableFuture<IGuildMember> gcf = member.giveRole("Assigning Rank", role);
-			gcf.thenAcceptAsync(nm -> {
-				MessageBuilder builder = new MessageBuilder(message.getChannel());
-				builder.append("Congraduations! ").mention(member).append(". You have ranked up to ").code(newRank.name());
-				builder.append(" from ").code(rank.name());
-				rank = newRank;
-				builder.sendMessage();
-			});
+			if (rank != newRank) {
+				gcf.thenAcceptAsync(nm -> {
+
+					MessageBuilder builder = new MessageBuilder(message.getChannel());
+					builder.append("Congraduations! ").mention(member).append(". You have ranked up to ").code(newRank.name());
+					builder.append(" from ").code(rank.name());
+					rank = newRank;
+					builder.sendMessage();
+				});
+			}
 			gcf.exceptionally(ex -> {
 				System.out.println("Unable to assign rank... Dming the creator");
 				ex.printStackTrace();
@@ -130,6 +135,10 @@ public class Player {
 	 */
 	public void setRank(Rank rank) {
 		this.rank = rank;
+	}
+
+	public int getColor() {
+		return Main.getGuild() == null ? 0x0 : Main.getGuild().getMember(id) == null ? 0x0 : Main.getGuild().getMember(id).getHighestRole() == null ? 0x0 : Main.getGuild().getMember(id).getHighestRole().getColor();
 	}
 
 }
