@@ -54,7 +54,7 @@ public class Listener extends EventListenerAdapter {
 	@Override
 	public void Disconnected(DisconnectEvent e) {
 		Main.logger.severe("Got disconnected from the gateway");
-		System.exit(0);
+		// System.exit(0);
 	}
 
 	@Override
