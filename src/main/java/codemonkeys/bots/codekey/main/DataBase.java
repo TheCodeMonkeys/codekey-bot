@@ -72,7 +72,7 @@ public class DataBase {
 		});
 	}
 
-	public static void createCase(long caseNumber, byte status, String reason, IUser user, IUser moderator, IMessage message) {
+	public static void createCase(long caseNumber, byte status, final String reason, IUser user, IUser moderator, IMessage message) {
 		db.sadd("cases.caseNumbers", Long.toUnsignedString(caseNumber, 10));
 		db.set(String.format("cases.%d", caseNumber), gson.toJson(new Case(caseNumber, status, reason, user, moderator, message)));
 	}

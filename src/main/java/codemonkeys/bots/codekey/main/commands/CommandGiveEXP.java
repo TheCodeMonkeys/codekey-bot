@@ -23,8 +23,8 @@ public class CommandGiveEXP extends Command {
 		setUnlocalizedName("giveexp");
 		setArgsRegex("<@\\d+> ?(-?\\d+\\.?\\d+)");
 		setUsage("giveexp <@user [@user]> <exp>");
-		setDescription("Gives the mentioned user exp");
-		setFullDescription("Gives the mentioned user exp.\nGiving someone a negative amount of EXP will take EXP away from them.");
+		setDescription("Gives the mentioned user(s) exp");
+		setFullDescription("Gives the mentioned user(s) exp.\nGiving someone a negative amount of EXP will take EXP away from them.");
 		setTextureName("codekey:giveexp");
 	}
 
@@ -70,7 +70,7 @@ public class CommandGiveEXP extends Command {
 
 	@Override
 	public boolean shouldExecute(IGuildMember member, IGuildTextChannel channel) {
-		if (!member.hasRole(member.getGuild().getRoleByID(219266745729286145l))) {
+		if (!member.hasRole(219266745729286145l)) {
 			channel.sendMessage("Only staff members can give people exp");
 			return false;
 		}

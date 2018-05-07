@@ -13,6 +13,7 @@ import io.discloader.discloader.core.entity.RichEmbed;
 import io.discloader.discloader.entity.auditlog.ActionTypes;
 import io.discloader.discloader.entity.auditlog.IAuditLog;
 import io.discloader.discloader.entity.auditlog.IAuditLogEntry;
+import io.discloader.discloader.entity.util.SnowflakeUtil;
 
 /**
  * @author Perry Berman
@@ -25,7 +26,7 @@ public class ModLogListener extends EventListenerAdapter {
 	}
 
 	private String getReasonText(long caseNumber) {
-		return String.format("No reason provided. Use `%sreason <%d> <reason>` to change the reason.", Main.config.prefix, caseNumber);
+		return String.format("No reason provided. Use `%sreason %d <reason>` to change the reason.", Main.config.prefix, caseNumber);
 	}
 
 	@Override
@@ -39,16 +40,25 @@ public class ModLogListener extends EventListenerAdapter {
 			return;
 		}
 		e.getGuild().getAuditLog(ActionTypes.MEMBER_BAN_ADD, 1).thenAcceptAsync(aLogs -> {
+			long caseNumber = getNextCaseNumber();
 			if (aLogs.getEntries().size() > 0) {
 				IAuditLogEntry entry = aLogs.getEntries().get(0);
 				if (entry.getTargetID() != e.getBannedUser().getID()) { // make sure that the member was actually kicked
+					final String reason = getReasonText(caseNumber);
+					RichEmbed embed = new RichEmbed().setAuthor("Member Banned", "https://thecodemonkeys.net", e.getBannedUser().getAvatar().toString());
+					embed.setColor(0xd0021b).setFooter("Case #" + caseNumber).setTimestamp();
+					embed.addField("Member", String.format("%s (%d) (%s)", e.getBannedUser(), e.getBannedUser().getID(), e.getBannedUser()));
+					embed.addField("Reason", reason);
+					embed.addField("Responsible Moderator", "Unknown Moderator");
+					e.getGuild().getTextChannelByID(Main.config.modLogs.logsChannelID).sendEmbed(embed).thenAcceptAsync(msg -> {
+						DataBase.createCase(caseNumber, (byte) 0, reason, e.getBannedUser(), null, msg);
+					});
 					return; // and return early if they weren't
 				}
-				long caseNumber = getNextCaseNumber();
 				final String reason = entry.getReason() == null ? getReasonText(caseNumber) : entry.getReason();
-				RichEmbed embed = new RichEmbed().setAuthor("Member Banned", "", aLogs.getUsers().get(entry.getTargetID()).getAvatar().toString());
+				RichEmbed embed = new RichEmbed().setAuthor("Member Banned", "https://thecodemonkeys.net", e.getBannedUser().getAvatar().toString());
 				embed.setColor(0xd0021b).setFooter("Case #" + caseNumber).setTimestamp();
-				embed.addField("Member", String.format("%s (%d) (%s)", e.getBannedUser(), e.getBannedUser().getID(), e.getBannedUser()));
+				embed.addField("Member", String.format("%s (%d) (%s)", e.getBannedUser(), e.getBannedUser().getID(), e.getBannedUser().toMention()));
 				embed.addField("Reason", reason);
 				embed.addField("Responsible Moderator", entry.getAuthor());
 				e.getGuild().getTextChannelByID(Main.config.modLogs.logsChannelID).sendEmbed(embed).thenAcceptAsync(msg -> {
@@ -64,14 +74,23 @@ public class ModLogListener extends EventListenerAdapter {
 			return;
 		}
 		e.getGuild().getAuditLog(ActionTypes.MEMBER_BAN_REMOVE, 1).thenAcceptAsync(aLogs -> {
+			long caseNumber = getNextCaseNumber();
 			if (aLogs.getEntries().size() > 0) {
 				IAuditLogEntry entry = aLogs.getEntries().get(0);
 				if (entry.getTargetID() != e.getUnbannedUser().getID()) { // make sure that the member was actually kicked
+					final String reason = getReasonText(caseNumber);
+					RichEmbed embed = new RichEmbed().setAuthor("Member Unbanned", "https://thecodemonkeys.net", e.getUnbannedUser().getAvatar().toString());
+					embed.setColor(0x00ff00).setFooter("Case #" + caseNumber).setTimestamp();
+					embed.addField("Member", String.format("%s (%d) (%s)", e.getUnbannedUser(), e.getUnbannedUser().getID(), e.getUnbannedUser().toMention()));
+					embed.addField("Reason", reason);
+					embed.addField("Responsible Moderator", "Unknown Moderator");
+					e.getGuild().getTextChannelByID(Main.config.modLogs.logsChannelID).sendEmbed(embed).thenAcceptAsync(msg -> {
+						DataBase.createCase(caseNumber, (byte) 2, reason, e.getUnbannedUser(), null, msg);
+					});
 					return; // and return early if they weren't
 				}
-				long caseNumber = getNextCaseNumber();
 				final String reason = entry.getReason() == null ? getReasonText(caseNumber) : entry.getReason();
-				RichEmbed embed = new RichEmbed().setAuthor("Member Unbanned", "", aLogs.getUsers().get(entry.getTargetID()).getAvatar().toString());
+				RichEmbed embed = new RichEmbed().setAuthor("Member Unbanned", "https://thecodemonkeys.net", e.getUnbannedUser().getAvatar().toString());
 				embed.setColor(0x00ff00).setFooter("Case #" + caseNumber).setTimestamp();
 				embed.addField("Member", String.format("%s (%d) (%s)", e.getUnbannedUser(), e.getUnbannedUser().getID(), e.getUnbannedUser().toMention()));
 				embed.addField("Reason", reason);
@@ -92,12 +111,10 @@ public class ModLogListener extends EventListenerAdapter {
 		cf.thenAcceptAsync(aLogs -> {
 			if (aLogs.getEntries().size() > 0) {
 				IAuditLogEntry entry = aLogs.getEntries().get(0);
-				System.out.println(entry.getTargetID() + ":" + e.getMember().getID());
-				if (entry.getTargetID() != e.getMember().getID()) { // make sure that the member was actually kicked
-					return; // and return early if they weren't
+				if (entry.getTargetID() != e.getMember().getID() || System.currentTimeMillis() - ((entry.getID() >> 22) + SnowflakeUtil.DISCORD_EPOCH) > 2000l) { // make sure that the member was actually kicked
+					return; // and return early if they weren't or if this is an old entry
 				}
 				long caseNumber = getNextCaseNumber();
-
 				final String reason = entry.getReason() == null ? getReasonText(caseNumber) : entry.getReason();
 				RichEmbed embed = new RichEmbed().setAuthor("Member Kicked", "", aLogs.getUsers().get(entry.getTargetID()).getAvatar().toString());
 				embed.setColor(0x77a3ea).setFooter("Case #" + caseNumber).setTimestamp();

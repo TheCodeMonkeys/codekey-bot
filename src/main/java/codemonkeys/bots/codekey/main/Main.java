@@ -12,9 +12,11 @@ import java.util.logging.Logger;
 import com.google.gson.Gson;
 
 import codemonkeys.bots.codekey.level.Player;
+import codemonkeys.bots.codekey.main.commands.CommandFetchRoles;
 import codemonkeys.bots.codekey.main.commands.CommandGiveEXP;
 import codemonkeys.bots.codekey.main.commands.CommandStatus;
 import codemonkeys.bots.codekey.modlog.ModLogListener;
+import codemonkeys.bots.codekey.modlog.commands.CommandMute;
 import codemonkeys.bots.codekey.modlog.commands.CommandReason;
 import io.discloader.discloader.client.command.CommandHelp;
 import io.discloader.discloader.client.render.util.Resource;
@@ -74,7 +76,7 @@ public class Main {
 			logger.severe("Failed to load the config file.");
 			System.exit(1);
 		}
-		loader = new DiscLoader(new DLOptions(config.auth.token, config.prefix, false));
+		loader = new DiscLoader(new DLOptions(config.auth.token, config.prefix, false).setDebug(true));
 		loader.addEventListener(new Listener());
 		loader.addEventListener(new ModLogListener());
 		loader.login().thenAcceptAsync((dl) -> {
@@ -84,6 +86,8 @@ public class Main {
 		CommandRegistry.registerCommand(new CommandGiveEXP(), "giveexp");
 		CommandRegistry.registerCommand(new CommandReason(), "reason");
 		CommandRegistry.registerCommand(new CommandStatus(), "status");
+		CommandRegistry.registerCommand(new CommandFetchRoles(), "fetchroles");
+		CommandRegistry.registerCommand(new CommandMute(), "mute");
 		LanguageRegistry.registerLanguage(enUS);
 	}
 

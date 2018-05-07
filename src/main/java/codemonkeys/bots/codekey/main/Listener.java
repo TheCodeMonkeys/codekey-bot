@@ -90,8 +90,9 @@ public class Listener extends EventListenerAdapter {
 
 	@Override
 	public void GuildMessageCreate(GuildMessageCreateEvent e) {
-		if (e.getGuild().getID() != 201544496654057472l)
+		if (e.getGuild().getID() != 201544496654057472l || Main.players == null) {
 			return;
+		}
 		IMessage message = e.getMessage();
 		IUser author = message.getAuthor();
 		long id = author.getID();
@@ -168,23 +169,26 @@ public class Listener extends EventListenerAdapter {
 		e.getLoader().getSelfUser().setGame(CommandHandler.prefix + "help || " + CommandHandler.prefix + "status");
 		DataBase.connect();
 		IGuild guild = Main.getGuild();
-		guild.fetchMembers().thenAccept(members -> {
-			if (Main.players == null || Main.players.size() == 0) {
-				Main.logger.info("Loading Player Data");
-				DataBase.loadPlayers(guild);
-				Main.logger.info("Loaded " + Main.players.size() + " Player(s)");
-			} else if (Main.players != null) {
-				DataBase.savePlayers(guild);
-			}
-		});
+		if (guild != null) {
+			guild.fetchRoles();
+			guild.fetchMembers().thenAccept(members -> {
+				if (Main.players == null || Main.players.size() == 0) {
+					Main.logger.info("Loading Player Data");
+					DataBase.loadPlayers(guild);
+					Main.logger.info("Loaded " + Main.players.size() + " Player(s)");
+				} else if (Main.players != null) {
+					DataBase.savePlayers(guild);
+				}
+			});
+		}
 	}
 
 	@Override
 	public void RawPacket(RawEvent e) {
 		if (e.isGateway()) {
-			if (e.getFrame().getPayloadText().contains("GUILD_BAN") || (e.getFrame().getPayloadText().contains("GUILD_MEMBER") && !e.getFrame().getPayloadText().contains("GUILD_MEMBERS_CHUNK"))) {
+			if (e.getFrame().getPayloadText().contains("GUILD_BAN") || e.getFrame().getPayloadText().contains("MESSAGE_CREATE") || (e.getFrame().getPayloadText().contains("GUILD_MEMBER") && !e.getFrame().getPayloadText().contains("GUILD_MEMBERS_CHUNK"))) {
 				new Thread(() -> {
-					System.out.println(e.getFrame().getPayloadText());
+//					System.out.println(e.getFrame().getPayloadText());
 				}).start();
 			}
 		}
