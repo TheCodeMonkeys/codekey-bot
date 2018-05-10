@@ -20,13 +20,11 @@ import io.discloader.discloader.entity.message.IMentions;
 import io.discloader.discloader.entity.message.IMessage;
 import io.discloader.discloader.entity.user.IUser;
 
-public class CommandMute extends Command {
-
-	public CommandMute() {
-		super();
-		setUnlocalizedName("mute");
-		setDescription("Mutes the mentioned user(s) from the mentioned channel(s)");
-		setFullDescription("Mutes the mentioned user(s) from the mentioned channel(s)\nForce mentioning a voice channel will server mute the user(s).");
+public class CommandUnmute extends Command {
+	public CommandUnmute() {
+		setUnlocalizedName("unmute");
+		setDescription("Unmutes the mentioned user(s) from the mentioned channel(s)");
+		setFullDescription("Umutes the mentioned user(s) from the mentioned channel(s)\nForce mentioning a voice channel will un server mute the user(s).");
 		setUsage("mute <@user [@user[...]]> <#channel [#channel[...]]> : <reason>");
 	}
 
@@ -47,24 +45,25 @@ public class CommandMute extends Command {
 		List<IUser> users = new ArrayList<>();
 		List<IOverwrite> ows = new ArrayList<>();
 		for (IGuildChannel chan : channels) {
-			ows.clear();
+			ows = new ArrayList<>(chan.getOverwrites().values());
 			for (IGuildMember member : mentions.getMembers()) {
 				if (member.getID() == msg.getAuthor().getID()) {
 					continue; // make sure you can't mute yourself.
 				}
-				users.add(member.getUser());
+				IOverwrite current = null;
 				switch (chan.getType()) {
 				case TEXT:
-					if (chan.getOverwriteByID(member.getID()) != null) {
-						ows.add(new Overwrite(chan.getOverwriteByID(member.getID()).getAllowed(), chan.getOverwriteByID(member.getID()).getDenied() | 0x800, member));
-					} else {
-						ows.add(new Overwrite(0, 0x800, member));
+					if ((current = chan.getOverwriteByID(member.getID())) != null) {
+						ows.remove(current);
+						if ((current.computePermissions().toLong() & 0x800) == 0x0) {
+							ows.add(new Overwrite(current.getAllowed(), current.getDenied() & ~0x800, member));
+						}
 					}
 					break;
 				case VOICE:
-					if (!member.isMuted()) {
+					if (member.isMuted()) {
 						try {
-							member.mute(reason).get();
+							member.unMute(reason).get();
 						} catch (InterruptedException | ExecutionException ex) {
 							ex.printStackTrace();
 						}
@@ -95,10 +94,10 @@ public class CommandMute extends Command {
 			}
 			chnls += mentions.getChannels().get(i).toMention();
 		}
-		embed.addField("Member(s) Muted", members, true).addField("Channels", chnls, true).addField("Reason", reason, true);
+		embed.addField("Member(s) Unmuted", members, true).addField("Channels", chnls, true).addField("Reason", reason, true);
 		try {
 			e.getChannel().sendEmbed(embed).get();
-			ModLogListener.createMutedCase(users, channels, reason);
+			ModLogListener.createUnmutedCase(users, channels, reason);
 		} catch (InterruptedException | ExecutionException e1) {
 			e1.printStackTrace();
 		}

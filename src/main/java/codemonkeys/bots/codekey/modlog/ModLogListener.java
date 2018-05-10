@@ -1,5 +1,6 @@
 package codemonkeys.bots.codekey.modlog;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import codemonkeys.bots.codekey.main.DataBase;
@@ -9,10 +10,15 @@ import io.discloader.discloader.common.event.ReadyEvent;
 import io.discloader.discloader.common.event.guild.GuildBanAddEvent;
 import io.discloader.discloader.common.event.guild.GuildBanRemoveEvent;
 import io.discloader.discloader.common.event.guild.member.GuildMemberRemoveEvent;
+import io.discloader.discloader.common.registry.EntityRegistry;
 import io.discloader.discloader.core.entity.RichEmbed;
 import io.discloader.discloader.entity.auditlog.ActionTypes;
 import io.discloader.discloader.entity.auditlog.IAuditLog;
 import io.discloader.discloader.entity.auditlog.IAuditLogEntry;
+import io.discloader.discloader.entity.channel.IGuildChannel;
+import io.discloader.discloader.entity.channel.IGuildTextChannel;
+import io.discloader.discloader.entity.guild.IGuild;
+import io.discloader.discloader.entity.user.IUser;
 import io.discloader.discloader.entity.util.SnowflakeUtil;
 
 /**
@@ -21,11 +27,11 @@ import io.discloader.discloader.entity.util.SnowflakeUtil;
  */
 public class ModLogListener extends EventListenerAdapter {
 
-	private long getNextCaseNumber() {
+	public static long getNextCaseNumber() {
 		return DataBase.getLatestCaseNumber() + 1;
 	}
 
-	private String getReasonText(long caseNumber) {
+	public static String getReasonText(long caseNumber) {
 		return String.format("No reason provided. Use `%sreason %d <reason>` to change the reason.", Main.config.prefix, caseNumber);
 	}
 
@@ -132,4 +138,19 @@ public class ModLogListener extends EventListenerAdapter {
 		});
 	}
 
+	public static void createMutedCase(List<IUser> users, List<IGuildChannel> channels, String reason) {
+
+	}
+
+	public static void createUnmutedCase(List<IUser> users, List<IGuildChannel> channels, String reason) {
+
+	}
+
+	public static IGuild getGuild() {
+		return EntityRegistry.getGuildByID(Main.config.modLogs.guildID);
+	}
+
+	public static IGuildTextChannel getLogsChannel() {
+		return getGuild().getTextChannelByID(Main.config.modLogs.logsChannelID);
+	}
 }
