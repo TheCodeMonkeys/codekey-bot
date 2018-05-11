@@ -21,7 +21,7 @@ import io.discloader.discloader.entity.message.IMessage;
 import io.discloader.discloader.entity.user.IUser;
 
 public class CommandMute extends Command {
-
+	
 	public CommandMute() {
 		super();
 		setUnlocalizedName("mute");
@@ -29,7 +29,7 @@ public class CommandMute extends Command {
 		setFullDescription("Mutes the mentioned user(s) from the mentioned channel(s)\nForce mentioning a voice channel will server mute the user(s).");
 		setUsage("mute <@user [@user[...]]> <#channel [#channel[...]]> : <reason>");
 	}
-
+	
 	@Override
 	public void execute(MessageCreateEvent e) {
 		IMessage msg = e.getMessage();
@@ -54,24 +54,24 @@ public class CommandMute extends Command {
 				}
 				users.add(member.getUser());
 				switch (chan.getType()) {
-				case TEXT:
-					if (chan.getOverwriteByID(member.getID()) != null) {
-						ows.add(new Overwrite(chan.getOverwriteByID(member.getID()).getAllowed(), chan.getOverwriteByID(member.getID()).getDenied() | 0x800, member));
-					} else {
-						ows.add(new Overwrite(0, 0x800, member));
-					}
-					break;
-				case VOICE:
-					if (!member.isMuted()) {
-						try {
-							member.mute(reason).get();
-						} catch (InterruptedException | ExecutionException ex) {
-							ex.printStackTrace();
+					case TEXT:
+						if (chan.getOverwriteByID(member.getID()) != null) {
+							ows.add(new Overwrite(chan.getOverwriteByID(member.getID()).getAllowed(), chan.getOverwriteByID(member.getID()).getDenied() | 0x800, member));
+						} else {
+							ows.add(new Overwrite(0, 0x800, member));
 						}
-					}
-					break;
-				default:
-					break;
+						break;
+					case VOICE:
+						if (!member.isMuted()) {
+							try {
+								member.mute(reason).get();
+							} catch (InterruptedException | ExecutionException ex) {
+								ex.printStackTrace();
+							}
+						}
+						break;
+					default:
+						break;
 				}
 			}
 			try {
@@ -98,15 +98,15 @@ public class CommandMute extends Command {
 		embed.addField("Member(s) Muted", members, true).addField("Channels", chnls, true).addField("Reason", reason, true);
 		try {
 			e.getChannel().sendEmbed(embed).get();
-			ModLogListener.createMutedCase(users, channels, reason);
+			ModLogListener.createMutedCase(msg.getAuthor(), users, channels, reason);
 		} catch (InterruptedException | ExecutionException e1) {
 			e1.printStackTrace();
 		}
 	}
-
+	
 	@Override
 	public boolean shouldExecute(IGuildMember member, IGuildTextChannel channel) {
 		return member.hasRole(219266745729286145l);
 	}
-
+	
 }

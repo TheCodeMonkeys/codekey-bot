@@ -27,7 +27,7 @@ public class CommandUnmute extends Command {
 		setFullDescription("Umutes the mentioned user(s) from the mentioned channel(s)\nForce mentioning a voice channel will un server mute the user(s).");
 		setUsage("mute <@user [@user[...]]> <#channel [#channel[...]]> : <reason>");
 	}
-
+	
 	@Override
 	public void execute(MessageCreateEvent e) {
 		IMessage msg = e.getMessage();
@@ -52,25 +52,25 @@ public class CommandUnmute extends Command {
 				}
 				IOverwrite current = null;
 				switch (chan.getType()) {
-				case TEXT:
-					if ((current = chan.getOverwriteByID(member.getID())) != null) {
-						ows.remove(current);
-						if ((current.computePermissions().toLong() & 0x800) == 0x0) {
-							ows.add(new Overwrite(current.getAllowed(), current.getDenied() & ~0x800, member));
+					case TEXT:
+						if ((current = chan.getOverwriteByID(member.getID())) != null) {
+							ows.remove(current);
+							if ((current.computePermissions().toLong() & 0x800) == 0x0) {
+								ows.add(new Overwrite(current.getAllowed(), current.getDenied() & ~0x800, member));
+							}
 						}
-					}
-					break;
-				case VOICE:
-					if (member.isMuted()) {
-						try {
-							member.unMute(reason).get();
-						} catch (InterruptedException | ExecutionException ex) {
-							ex.printStackTrace();
+						break;
+					case VOICE:
+						if (member.isMuted()) {
+							try {
+								member.unMute(reason).get();
+							} catch (InterruptedException | ExecutionException ex) {
+								ex.printStackTrace();
+							}
 						}
-					}
-					break;
-				default:
-					break;
+						break;
+					default:
+						break;
 				}
 			}
 			try {
@@ -79,8 +79,8 @@ public class CommandUnmute extends Command {
 				ex.printStackTrace();
 			}
 		}
-		RichEmbed embed = new RichEmbed("Members Muted").setTimestamp();
-		embed.setDescription("The following user(s) have been muted in the following channel(s)");
+		RichEmbed embed = new RichEmbed("Members Unmuted").setTimestamp();
+		embed.setDescription("The following user(s) have been unmuted in the following channel(s)");
 		String members = "", chnls = "";
 		for (int i = 0; i < mentions.getMembers().size(); i++) {
 			if (i != 0) {
@@ -97,15 +97,15 @@ public class CommandUnmute extends Command {
 		embed.addField("Member(s) Unmuted", members, true).addField("Channels", chnls, true).addField("Reason", reason, true);
 		try {
 			e.getChannel().sendEmbed(embed).get();
-			ModLogListener.createUnmutedCase(users, channels, reason);
+			ModLogListener.createUnmutedCase(msg.getAuthor(), users, channels, reason);
 		} catch (InterruptedException | ExecutionException e1) {
 			e1.printStackTrace();
 		}
 	}
-
+	
 	@Override
 	public boolean shouldExecute(IGuildMember member, IGuildTextChannel channel) {
 		return member.hasRole(219266745729286145l);
 	}
-
+	
 }

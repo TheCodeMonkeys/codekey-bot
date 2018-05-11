@@ -6,7 +6,7 @@ public class Config {
 	public Auth auth = new Auth();
 	public ModLogs modLogs = new ModLogs();
 
-	public boolean debug = false;
+	public boolean debug = false, exitOnDisconnect = true;
 
 	public long guildID = 0l;
 

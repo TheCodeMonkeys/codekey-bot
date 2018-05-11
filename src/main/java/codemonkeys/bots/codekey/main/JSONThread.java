@@ -9,9 +9,9 @@ import io.discloader.discloader.common.logger.DLLogger;
 import io.discloader.discloader.common.registry.EntityRegistry;
 
 public class JSONThread extends Thread {
-
+	
 	public static Logger logger = DLLogger.getLogger(JSONThread.class);
-
+	
 	@Override
 	public void run() {
 		super.run();
