@@ -26,20 +26,20 @@ import io.discloader.discloader.entity.util.SnowflakeUtil;
  *
  */
 public class ModLogListener extends EventListenerAdapter {
-	
+
 	public static long getNextCaseNumber() {
 		return DataBase.getLatestCaseNumber() + 1;
 	}
-	
+
 	public static String getReasonText(long caseNumber) {
 		return String.format("No reason provided. Use `%sreason %d <reason>` to change the reason.", Main.config.prefix, caseNumber);
 	}
-	
+
 	@Override
 	public void Ready(ReadyEvent e) {
 		DataBase.connect();
 	}
-	
+
 	@Override
 	public void GuildBanAdd(GuildBanAddEvent e) {
 		if (e.getGuild().getID() != Main.config.modLogs.guildID) {
@@ -67,13 +67,13 @@ public class ModLogListener extends EventListenerAdapter {
 				embed.addField("Member", String.format("%s (%d) (%s)", e.getBannedUser(), e.getBannedUser().getID(), e.getBannedUser().toMention()));
 				embed.addField("Reason", reason);
 				embed.addField("Responsible Moderator", entry.getAuthor());
-				e.getGuild().getTextChannelByID(Main.config.modLogs.logsChannelID).sendEmbed(embed).thenAcceptAsync(msg -> {
+				getLogsChannel().sendEmbed(embed).thenAcceptAsync(msg -> {
 					DataBase.createCase(caseNumber, (byte) 0, reason, e.getBannedUser(), entry.getAuthor(), msg);
 				});
 			}
 		});
 	}
-	
+
 	@Override
 	public void GuildBanRemove(GuildBanRemoveEvent e) {
 		if (e.getGuild().getID() != Main.config.modLogs.guildID) {
@@ -107,7 +107,7 @@ public class ModLogListener extends EventListenerAdapter {
 			}
 		});
 	}
-	
+
 	@Override
 	public void GuildMemberRemove(GuildMemberRemoveEvent e) {
 		if (e.getGuild().getID() != Main.config.modLogs.guildID) {
@@ -117,14 +117,7 @@ public class ModLogListener extends EventListenerAdapter {
 		cf.thenAcceptAsync(aLogs -> {
 			if (aLogs.getEntries().size() > 0) {
 				IAuditLogEntry entry = aLogs.getEntries().get(0);
-				if (entry.getTargetID() != e.getMember().getID() || System.currentTimeMillis() - ((entry.getID() >> 22) + SnowflakeUtil.DISCORD_EPOCH) > 2000l) { // make
-																																									 // sure
-																																									 // that
-																																									 // the
-																																									 // member
-																																									 // was
-																																									 // actually
-																																									 // kicked
+				if (entry.getTargetID() != e.getMember().getID() || System.currentTimeMillis() - ((entry.getID() >> 22) + SnowflakeUtil.DISCORD_EPOCH) > 2000l) { // make // kicked
 					return; // and return early if they weren't or if this is an old entry
 				}
 				long caseNumber = getNextCaseNumber();
@@ -144,7 +137,7 @@ public class ModLogListener extends EventListenerAdapter {
 			return null;
 		});
 	}
-	
+
 	public static void createMutedCase(IUser moderator, List<IUser> users, List<IGuildChannel> channels, String reason) {
 		long caseNumber = getNextCaseNumber();
 		RichEmbed embed = new RichEmbed("Members Muted").setTimestamp();
@@ -168,7 +161,7 @@ public class ModLogListener extends EventListenerAdapter {
 			DataBase.createCase(caseNumber, (byte) 0x3, reason, moderator, msg, users, channels);
 		});
 	}
-	
+
 	public static void createUnmutedCase(IUser moderator, List<IUser> users, List<IGuildChannel> channels, String reason) {
 		long caseNumber = getNextCaseNumber();
 		RichEmbed embed = new RichEmbed("Members Unmuted").setTimestamp();
@@ -192,11 +185,11 @@ public class ModLogListener extends EventListenerAdapter {
 			DataBase.createCase(caseNumber, (byte) 0x4, reason, moderator, msg, users, channels);
 		});
 	}
-	
+
 	public static IGuild getGuild() {
 		return EntityRegistry.getGuildByID(Main.config.modLogs.guildID);
 	}
-	
+
 	public static IGuildTextChannel getLogsChannel() {
 		return getGuild().getTextChannelByID(Main.config.modLogs.logsChannelID);
 	}

@@ -29,14 +29,16 @@ import io.discloader.discloader.entity.message.IMessage;
 import io.discloader.discloader.entity.user.IUser;
 
 /**
- * Created by Thvardhan and maintained by R3alCl0ud from codemonkeys discord server https://discord.gg/PAH8y8W on 9/22/17.
+ * Created by Thvardhan and maintained by R3alCl0ud from codemonkeys discord
+ * server https://discord.gg/PAH8y8W on 9/22/17.
  */
 public class Listener extends EventListenerAdapter {
 	/**
-	 * Map of the last time a user was given EXP indexed by the user's {@link IUser#getID() id}
+	 * Map of the last time a user was given EXP indexed by the user's
+	 * {@link IUser#getID() id}
 	 */
 	public static Map<Long, Long> lastEXP = new HashMap<>();
-	
+
 	public static void writeToJSON() throws IOException {
 		Main.logger.info("Saving Player Data");
 		FileWriter fw = new FileWriter(Main.DATABASE);
@@ -48,13 +50,13 @@ public class Listener extends EventListenerAdapter {
 		fw.write(json.toString(4));
 		fw.close();
 	}
-	
+
 	@Override
 	public void Disconnected(DisconnectEvent e) {
 		Main.logger.severe("Got disconnected from the gateway");
 		System.exit(0);
 	}
-	
+
 	@Override
 	public void GuildMemberRoleAdd(GuildMemberRoleAddEvent e) {
 		if (e.getRole().getID() == 295918777613287444l) {
@@ -85,7 +87,7 @@ public class Listener extends EventListenerAdapter {
 			});
 		}
 	}
-	
+
 	@Override
 	public void GuildMessageCreate(GuildMessageCreateEvent e) {
 		if (e.getGuild().getID() != 201544496654057472l || Main.players == null) {
@@ -94,19 +96,20 @@ public class Listener extends EventListenerAdapter {
 		IMessage message = e.getMessage();
 		IUser author = message.getAuthor();
 		long id = author.getID();
-		
+
 		/*
-		 * If the message starts with PREFIX (~) then it will be further checked for word 'status' if
-		 * (event.getMessage().getContent().startsWith(Main.PREFIX)) handleCommand(event.getMessage().getContent(), event); If the user is a
-		 * bot OR they are checking their status ignore them
+		 * If the message starts with PREFIX (~) then it will be further checked for
+		 * word 'status' if (event.getMessage().getContent().startsWith(Main.PREFIX))
+		 * handleCommand(event.getMessage().getContent(), event); If the user is a bot
+		 * OR they are checking their status ignore them
 		 */
 		if (e.getMessage().getAuthor().isBot() || e.getMessage().getContent().toLowerCase().startsWith(Main.PREFIX + "status")) // don't
-																																 // give exp
-																																 // if the
-																																 // user is
-																																 // checking
-																																 // someones
-																																 // status
+																																// give exp
+																																// if the
+																																// user is
+																																// checking
+																																// someones
+																																// status
 			return;
 		long currentTime = System.currentTimeMillis();
 		Player player = Main.players.get(id);
@@ -118,14 +121,14 @@ public class Listener extends EventListenerAdapter {
 			Main.logger.info("Registering new user (" + author.toString() + ") into the database");
 		}
 		player.setLastMsgID(e.getMessage().getID());
-		
+
 		player.checkForNewRank(e); // always check rank to force syncing
-		
+
 		if ((lastEXP.containsKey(id) && currentTime - lastEXP.get(id) < 60000) || e.getChannel().getID() == 208003522157871124l) {
 			// if it's been less than a minute since the user received EXP, write to JSON
 			// and return.
 			try {
-				
+
 				// Once player gets the new score, update the database file.
 				DataBase.savePlayer(e.getGuild(), player);
 				writeToJSON();
@@ -136,19 +139,20 @@ public class Listener extends EventListenerAdapter {
 			}
 			return;
 		}
-		
+
 		/*
-		 * If the program gets here, either the user's cooldown is over or, they haven't sent a message . So we should set the value at
-		 * user.id in the lastEXP map to currentTime
+		 * If the program gets here, either the user's cooldown is over or, they haven't
+		 * sent a message . So we should set the value at user.id in the lastEXP map to
+		 * currentTime
 		 */
 		lastEXP.put(id, currentTime); // id is the user's ID, and currentTime is the current time in milliseconds.
-		
+
 		// Adds exp to respective player with the formula EXP=WORDS/TOTAL_LENGTH with
 		// some adjustments
-		
+
 		double exp = PlayerUtils.getEXPFromMessage(message.getContent());
 		player.addExp(exp, e);
-		
+
 		Main.logger.info("Gave " + author + " " + exp + "EXP");
 		try {
 			// Once player gets the new score, update the database file.
@@ -160,7 +164,7 @@ public class Listener extends EventListenerAdapter {
 			EntityRegistry.getUserByID(104063667351322624l).sendMessage("Error: " + ex.getMessage());
 		}
 	}
-	
+
 	@Override
 	public void Ready(ReadyEvent e) {
 		Main.logger.info("Codekey is now ready to communicate with Discord");
@@ -181,19 +185,18 @@ public class Listener extends EventListenerAdapter {
 			});
 		}
 	}
-	
+
 	@Override
 	public void RawPacket(RawEvent e) {
 		if (e.isGateway()) {
-			if (e.getFrame().getPayloadText().contains("GUILD_BAN") || e.getFrame().getPayloadText().contains("MESSAGE_CREATE")
-					|| (e.getFrame().getPayloadText().contains("GUILD_MEMBER") && !e.getFrame().getPayloadText().contains("GUILD_MEMBERS_CHUNK"))) {
+			if (e.getFrame().getPayloadText().contains("GUILD_BAN") || (e.getFrame().getPayloadText().contains("GUILD_MEMBER") && !e.getFrame().getPayloadText().contains("GUILD_MEMBERS_CHUNK"))) {
 				new Thread(() -> {
-					// System.out.println(e.getFrame().getPayloadText());
+//					Main.logger.config(e.getFrame().getPayloadText());
 				}).start();
 			}
 		}
 	}
-	
+
 	protected void writeToCSV() throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(Main.DATABASE));
 		List<Player> players = new ArrayList<>(Main.players.values());
@@ -204,5 +207,5 @@ public class Listener extends EventListenerAdapter {
 		writer.flush();
 		writer.close();
 	}
-	
+
 }

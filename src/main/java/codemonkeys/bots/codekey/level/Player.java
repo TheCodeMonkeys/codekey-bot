@@ -56,7 +56,7 @@ public class Player {
 			if (rank != newRank) {
 				gcf.thenAcceptAsync(nm -> {
 					MessageBuilder builder = new MessageBuilder(event.getChannel());
-					builder.append("Congraduations! ").mention(member).append(". You have ranked up to ").code(newRank.name());
+					builder.append("Congratulations! ").mention(member).append(". You have ranked up to ").code(newRank.name());
 					builder.append(" from ").code(rank.name());
 					rank = newRank;
 					builder.sendMessage();
@@ -84,7 +84,7 @@ public class Player {
 				gcf.thenAcceptAsync(nm -> {
 
 					MessageBuilder builder = new MessageBuilder(message.getChannel());
-					builder.append("Congraduations! ").mention(member).append(". You have ranked up to ").code(newRank.name());
+					builder.append("Congratulations! ").mention(member).append(". You have ranked up to ").code(newRank.name());
 					builder.append(" from ").code(rank.name());
 					rank = newRank;
 					builder.sendMessage();
