@@ -30,11 +30,10 @@ import io.discloader.discloader.common.registry.EntityRegistry;
 import io.discloader.discloader.entity.guild.IGuild;
 
 /**
- * Created by thvardhan from codemonkeys discord server
- * https://discord.gg/PAH8y8W on 9/22/17.
+ * Created by thvardhan from codemonkeys discord server https://discord.gg/PAH8y8W on 9/22/17.
  */
 public class Main {
-
+	
 	public static String token;
 	public static final String DATABASE = "players.json";
 	public static final String DATABASE_BACKUP = "players_backup.json";
@@ -43,31 +42,31 @@ public class Main {
 	// players.json contains the database.
 	public static Map<Long, Player> players;
 	public static DiscLoader loader;
-
+	
 	public static final String PREFIX = "~";
-
+	
 	public static final Logger logger = DLLogger.getLogger("CodeKey");
-
+	
 	public static Config config; // because having to change the PREFIX string every time I upload a new build it
-									// annoying
-
+								 // annoying
+	
 	public static final String[] fileExts = { ".java", ".c", ".cpp", ".js", ".py", ".vb", ".css", ".html", ".sh", ".bat", ".exe", ".msi", ".jar", ".cs", ".json", ".xml", ".hs", ".php", ".dll", ".deb", ".pak" };
 	public static Thread jsonThread;
-
+	
 	public static final Language enUS = new Language(new Resource("codekey", "lang/en-US.lang").getResourceAsStream(), Locale.US);
-
+	
 	public static String getCopyright() {
 		return String.format("©Code Monkeys%s %d", fileExts[(int) Math.round(Math.random() * (fileExts.length - 1))], getYear());
 	}
-
+	
 	public static IGuild getGuild() {
 		return EntityRegistry.getGuildByID(config.guildID);
 	}
-
+	
 	public static int getYear() {
 		return 1970 + (int) (System.currentTimeMillis() / 31556952000l);
 	}
-
+	
 	public static void main(String[] args) throws Exception {
 		try {
 			readConfig();
@@ -90,7 +89,7 @@ public class Main {
 		CommandRegistry.registerCommand(new CommandMute(), "mute");
 		LanguageRegistry.registerLanguage(enUS);
 	}
-
+	
 	/**
 	 * Reads the config file from disk
 	 * 
@@ -110,25 +109,21 @@ public class Main {
 			writeConfig(options);
 		}
 	}
-
+	
 	public static void writeConfig(File options) throws IOException {
 		Gson gson = new Gson();
 		FileWriter fw = new FileWriter(options);
 		fw.write(gson.toJson(config));
 		fw.close();
 	}
-
+	
 }
 
 /*
- * 76 exp - Kilobyte 464 exp - Megabyte 949 exp - Gigabyte 1758 exp - Terabyte
- * 2676 exp - Petabyte 3812 exp - Exabyte 5187 exp - JuniorMod (apply) 10,000 -
- * MoD begins (present ones) Score will only count if the last message is by
- * other memeber. should the same memeber send a message twice, it wont count.
- * #thank command --- #thank @user reason once/day score = Message
- * Length/wordsCharacters S.MOD=309767924921532426 STAFF=219266745729286145
- * EXA=241334568039219200 PETA=219278875203600384 TERA=219278855372931072
- * GIGA=219278838750773249 MEGA=219278815866781697 KILO=219278753849671690
- * TRASH=295918777613287444 TO add a new rank, just go to playerUtils.java and
- * the three return methods as well as RANK enum.
+ * 76 exp - Kilobyte 464 exp - Megabyte 949 exp - Gigabyte 1758 exp - Terabyte 2676 exp - Petabyte 3812 exp - Exabyte 5187 exp - JuniorMod
+ * (apply) 10,000 - MoD begins (present ones) Score will only count if the last message is by other memeber. should the same memeber send a
+ * message twice, it wont count. #thank command --- #thank @user reason once/day score = Message Length/wordsCharacters
+ * S.MOD=309767924921532426 STAFF=219266745729286145 EXA=241334568039219200 PETA=219278875203600384 TERA=219278855372931072
+ * GIGA=219278838750773249 MEGA=219278815866781697 KILO=219278753849671690 TRASH=295918777613287444 TO add a new rank, just go to
+ * playerUtils.java and the three return methods as well as RANK enum.
  */
